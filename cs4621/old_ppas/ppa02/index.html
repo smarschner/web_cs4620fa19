@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>CS 4621: PPA2 -- Street View</title>
+
+    <!-- Bootstrap -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/cs4620.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="container">
+    <h1>CS 4621 PPA2 <span class="subtitle">Street View</span></h1>
+    <p class="courseinfo">Out: Friday March 2, 2018</p>
+    <p class="courseinfo">Due: Friday March 16, 2018 at 11:59pm</p>
+    <p class="courseinfo">Work in groups of up to 4.</p>
+
+    <h2>Overview</h2>
+
+    <p>In this assignment, you will build a web application that mimics the basic behavior of Google Street View:</p>
+
+    <center>
+        <iframe src="https://www.google.com/maps/embed?pb=!4v1519763876432!6m8!1m7!1s4hhj-SCKPKzVNEj2HuoG2w!2m2!1d42.4448555675049!2d-76.4815902849929!3f64.71326861025263!4f6.706230844722768!5f0.7820865974627469" width="600" height="450" frameborder="0" style="border:0" allowfullscreen></iframe>
+    </center>
+
+    <p>
+        Your application will take a number of spherical panorama images taken around the Cornell campus, and display them as if the user is standing at the center of the sphere. When the user clicks and drags, the camera will pan and tilt according to their mouse movements. When the user scrolls, the camera will zoom in and out accordingly. Your program will also display semi-opaque icons that indicate the direction towards other panoramas. When the user clicks on a badge, the panorama currently being viewed will be replaced with the panorama at the neighboring location.
+    </p>
+
+    <h2>Demonstration</h2>
+
+    <center>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/5mZmo0clVAo" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </center>
+
+    <h2>Logistics</h2>
+
+    <p>
+        First, download the <a href="ppa02_framework.zip">starter code</a>. We recommend creating a git repository for
+        development, but <b>please don't share your code publicly.</b>
+    </p>
+
+    <p>
+        Inside the directory, open <code>index.html</code>, and you should see a web page with only the page's
+        header, a WebGL canvas, a short bit of JavaScript code, and some text asking you to list your team members.
+    </p>
+
+    <p>
+        Please modify <code>index.html</code> so that it displays the panoramas in a way similar to what is shown
+        in the video. You may also add other code to the directory. However, do not use any 3D rendering
+        framework such as <a href="https://threejs.org/">three.js</a>. Linear algebra libraries such as
+        <a href="http://glmatrix.net/">glMatrix</a> are fine. Our solution code, however, does not use any
+        extra libraries besides what is already in the ZIP file.
+    </p>
+
+    <p>
+        Once you're done writing your solution, ZIP the <code>cs4621/ppa02_student</code> directory, and submit
+        the ZIP file to CMS.
+    </p>
+
+    <h2>Specification</h2>
+
+    <p>
+        There are a few different pieces to this assignment. We will describe how they should behave in
+        your program below, but we leave most of the implementation details (e.g., data management, the JavaScript/GLSL split,
+        how many and what kind of attribute, varying, and uniform variables to use, etc.) up to you.
+    </p>
+
+    <h3>Panorama Viewing</h3>
+
+    <p>
+        We provide a number of JPEG images in the <code>img/</code> directory. Each of these is a spherical panorama at
+        a particular location on campus as indicated by the name of the image. The user will view one of these panoramas at a time.
+        Each of these images has their pixels laid out according to spherical coordinates, where rows of pixels correspond to 
+        lines of latitude, and columns of pixels correspond to lines of longitude.
+    </p>
+
+    <p>
+        To view the image correctly, each pixel on the canvas must calculate spherical coordinates, and then translate these to
+        texture coordinates, which will then be used to sample the image. You can calculate each pixel's spherical coordinates
+        from a camera model that is very similar to the model from the previous assignment. The camera's position doesn't change as the
+        user looks around the panorama, so the region of the image displayed to the canvas depends only on the camera's viewing
+        direction and its field of view.
+    </p>
+
+    <p>
+        Keep in mind there are many edge cases to account for here. What happens when the user views the seam where edges of the image
+        meet? What happens when the user looks at (or looks near) the poles? Is it true that each row of pixels on the canvas has the
+        same latitude? If you see some form of distortion in your images, we recommend testing this piece of the program by coloring 
+        each pixel according to its texture coordinate.
+    </p>
+
+
+    <h3>User Interaction</h3>
+
+    <p>
+        When the user clicks and drags, the camera should pan and tilt accordingly. When the user is looking out towards the horizon,
+        the spot on the panorama that the user clicks should nearly follow the cursor as they drag it around the canvas. When
+        the user is looking near the poles, however, this requirement is relaxed. You should prevent the user from tilting upwards when they
+        are looking straight up or tilting downwards when they are looking straight down, and you shouldn't allow the user to flip the camera
+        upside down or otherwise modify the camera's roll.
+        In short, the camera rotation behavior should be similar to that of Google Street View.
+        As a side note, you might find it useful to keep the camera rotating as the user drags beyond the bounds of the canvas, though
+        this is not required.
+    </p>
+
+    <p>
+        When a user scrolls on the canvas, you should prevent the page from scrolling as it normally would. Instead, you should zoom
+        the camera in when the user scrolls up, or zoom the camera out when the user scrolls down. You can zoom by modifying the camera's
+        field of view. You should clamp the field of view to a range of reasonable values (e.g., between 1 and 80 degrees).
+    </p>
+
+    <h3>Moving Between Panoramas</h3>
+
+    <p>
+        Each panorama image contains metadata that describes (among other things) where the photo was taken and the orientation of
+        the image. To extract this metadata, we use the <a href="https://github.com/exif-js/exif-js">exif-js</a> library (included
+        in the framework). This library takes raw image data and extracts metadata in the form of EXIF, IPTC, and XMP tags. However,
+        it is a little inconvenient to use when you are extracting data from several images at once.
+    </p>
+    
+    <p>
+        To ease this process, we have provided a function called <code>getImageMetadata(queue, callback)</code> in
+        <code>index.html</code>. This function takes as arguments a PreloadJS <code>LoadQueue</code> object (in which all
+        images have previously been loaded), and a callback function. The <code>getImageMetadata</code> function returns immediately,
+        but the images will be processed asynchronously. When the metadata is ready, the input callback function will be called
+        with a single argument, which is an array of objects that is the same length as the input queue. Each object in this array
+        contains four fields:
+        <ul>
+            <li><code>id</code>: A string which is the id associated with the image in the PreloadJS <code>LoadQueue</code>.</li>
+            <li><code>latitude:</code> An array (length 3) of numbers, containing the degrees, minutes, and seconds of latitude north.</li>
+            <li><code>longitude:</code> An array (length 3) of numbers, containing the degrees, minutes, and seconds of longitude west.</li>
+            <li><code>heading:</code> An integer in the range [0, 359], representing the direction in the center of the panorama. This is specified as a compass heading; that is, 0 degrees is north, and degrees increase as you turn <b>clockwise</b>.</li>
+        </ul>
+        If an image does not contain the above tags, then the fields of its corresponding object may be left undefined.
+    </p>
+
+    <p>
+        Once you have the location of each image, you should determine which locations should be accessible from each of the others. That
+        is, you should construct a graph between the locations where edges indicate that it is possible to move from one location to
+        the other. In order to make sure there are no dead ends, I recommend using the following criteria to create edges:
+        <ul>
+            <li>At the very least, each location should share edges with its 2 nearest neighbors.</li>
+            <li>Edges are undirected; that is, an edge from location A to location B implies an edge from location B to location A.</li>
+        </ul>
+    </p>
+
+    <p>
+        Once you have this graph, you should display icons on the panorama showing the directions towards neighboring locations. This icon has
+        the path <code>img/chevron.png</code>. This image contains transparency data to separate foreground from background, which you should
+        use when displaying it on the canvas. In addition, you should modify the foreground of the image so it is semi-opaque, i.e., the
+        panorama should still be slightly visible underneath the icon. When the user hovers over an icon, create some visual indication that
+        the icon is selected; for instance, make the icon brighter or more opaque. When the user clicks on an icon, they should be taken to the
+        appropriate location, i.e., the current panorama should be exchanged for the one in the direction of the icon.
+    </p>
+
+    <p>
+        The icon should be placed at a reasonable location on the canvas (i.e., pointing in a direction that is consistent with the current panorama
+        and the relative direction towards the neighboring panorama), and should not be distorted. The icon should be considered clicked if and only
+        if the user clicks on a non-transparent pixel on the icon. It is okay if the icon does not change size as the user zooms in
+        or out, but make sure that the clickable area of the icon is consistent with this behavior. If the user clicks on a location where two
+        icons overlap, you may break ties arbitrarily, but this should be consistent with whichever icon is highlighted.
+    </p>
+
+
+    <h3>Extras</h3>
+
+    <p>
+        In order to receive full credit, you must implement at least one other feature beyond what is
+        specified above. The amount of points you will receive depends on the effort spent on extra
+        features. Implementing many features, or implementing an especially impressive feature, may earn extra credit.
+        Some ideas for extra features are listed below.
+    </p>
+
+    <ul>
+        <li>
+            In the real Google Street View, the camera has a bit of momentum; that is, it continues to pan and tilt for a short time
+            after the user has finished clicking and dragging. Implement this behavior in your application.
+        </li>
+        <li>
+            In the real Google Street View, when the user scrolls to zoom in, the camera gently points towards the location underneath
+            the mouse cursor. Implement this behavior in your application.
+        </li>
+        <li>
+            The canvas is a fixed-size square by default. Change the WebGL canvas HTML tags so that it is resizable and/or takes up the entire page.
+            This requires changing your camera setup so that it can have different fields of view in the x and y directions. To see a reference
+            for how your camera should behave as the page resizes, see Google Street View.
+        </li>
+        <li>
+            In the real Google Street View, the icons lay flat against the ground rather than floating in space. Transform your icons so that they do
+            the same. Don't worry about accounting for changes in elevation (although the images contain altitude in the metadata if you would like to give
+            it a try). It may help to know that the center of the photo sphere was approximately 170cm above the ground when these photos were taken.
+            Don't forget to account for this transformation when determining if a user clicked on an icon!
+        </li>
+        <li>
+            In the real Google Street View, there is an animated transition when the user switches between panoramas. To implement this properly, you
+            would need depth data, which is not present in these photos (and determining the depth from a single photo is a very challenging computer
+            vision problem), but it would still be nice to give the user some visual feedback as they move through the world. Come up with an algorithm
+            to blend between panoramas as the user switches between them, ideally in a way that shows that they are moving towards
+            the neighboring location.
+        </li>
+        <li>
+            This spherical projection is not the only way to display images of an environment; another very typical method is
+            <a href="https://en.wikipedia.org/wiki/Cube_mapping">cube mapping</a>, where each face of a cube surrounding a camera (north, south, east, west,
+            up, and down) is associated with its own image. Spherical coordinates then map into one of these images. Augment your application to display
+            cube maps as well as spherical projections. Because cube maps are so common, WebGL includes a number of tools for using them; you may take
+            advantage of these rather than writing your own cube map lookup function.
+        </li>
+        <li>
+            Come up with your own idea. If you want to try something but are unsure of how to implement it, please consult the course staff.
+        </li>
+    </ul>
+
+    <h2>Etc.</h2>
+
+    <p>
+        If you would like to make your own spherical panorama images, you can do so with a modern smartphone. The Google Street View app allows you
+        to capture panoramas by taking several photos with your smartphone camera, which it then stitches together into a single image. You can then
+        transfer captured images to your computer. (The app also allows you to download spherical panoramas that others have captured and shared publicly,
+        but these have low resolution).
+    </p>
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="../js/jquery-3.1.1.min.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,133 @@
+<!-- <h1><strong>PA 7: Ray2</strong></h1> -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+<h3> Written part</h3>
+<p class="duedate">Due: Wednesday November 28th 2018 (11:59pm)</p>
+<p> 1. 1D Monte Carlo Integration<p>
+Consider the integral:
+$$\int_0^2 e^{-2x} \, dx$$
+<p> a.) Compute the analytic solution to this integral. <p>
+<p> b.) Write down a Monte Carlo estimator for this integral using uniform sampling. <p>
+<p> c.) Implement the Monte Carlo estimation in (b) (You can choose whatever language you like). For a given number of samples \(n\), you can measure how accurate your estimate is by doing \(m\) trials and computing the average absolute difference between the analytic solution and the Monte Carlo estimate.  Make a plot of the error as a function of the number of samples, on a log-log scale, using the number of samples 16, 32, 64, ..., 65536.  What can you say from the plot about how the error changes with the number of samples?
+
+
+<p> 2. 2D Monte Carlo Integration and shading <p>
+Consider a scene where a square light source is standing vertically on a planar Lambertian surface.  The light is in the \(z=0\) plane, covering the area \(0 \le y \le 1\) and \(-\frac{1}{2} \le x \le \frac{1}{2}\), and the surface is in the \(y=0\) plane.  In lecture, we talked about two ways to formulate the problem of computing the light reflected from ths surface.  One is an integral over points on the the light; let's see how this approach performs using Monte Carlo integration for shading points on the \(z\) axis at 0.1, 1, and 10 units away from the light. The diffuse reflectance of the Lambertian surface is \(k_r=0.5\). The square light source radiance equals to 1 and is uniform across the source area.
+<div class="thumbnails" style="text-align: center">
+    <img src="images/a7/ray2.png">
+</div>
+<p>a.) For each of the three shading points, write out the reflected radiance as an integral over the light's area, as a function of \(x\) and \(y\).  Use your favorite plotting software to visualize the integrand, for instance as a height-field plot or a color-mapped square image, for each of the three shading points.</p>
+<p>b.) Compute the correct answer to this 2D integration problem for each of the three shading points using Wolfram Alpha or a similar tool.</p>
+<p>c.) Write down a Monte Carlo estimator for this integral using uniform sampling over the light source area and compute the mean and standard deviation of 1000 samples of this estimator.  In which case does it give the lowest and highest relative error (measured as standard deviation divided by the true answer), and, briefly, why? <p>
+
+3. (Continue with problem 2.)<p>
+Now we want to compute the same integral using a different strategy, integrating over directions at the receiving point.  In this case, the integrand is defined on the hemisphere of unit vector directions \(\omega_i\), and its value is 1 if the ray \((\mathbf{x}, \omega_i)\) hits the light, and 0 otherwise. We'll use the probability density \(p(\omega_i) = \cos\theta / \pi\) where \(\theta\) is the angle between the surface normal and \(\omega_i\).
+
+<p>a.) We can generate unit vectors in this cosine distribution in cylindrical coordinates, using the following equations. Start with two random variables \(s_1, s_2 \in [0, 1]\), which gives us a uniform sample from a unit square. The relationship between uniform samples in the unit square and cosine-distributed samples on the unit hemisphere is:
+\[ r = \sqrt{s_1}\]
+\[ \phi = 2\pi s_2\]
+\[ z = \sqrt{1 - r^2}\]
+where \(r\) and \(\phi\) are polar coordinates in the \(x\)-\(y\) plane, and z is the height above the plane.  (A better approach is based on a "concentric" mapping from the unit square to the unit circle, but this one will do).  Use the above formula to implement a function that produces points on the hemisphere, and demonstrate that the points are cosine-distributed using a histogram: bin 10,000 random points in to 100 equal-sized bins in theta, and make a plot of the fraction of samples in each bin divided by the soild angle of the bin, as a function of \(\theta\).  Compare the results to the expected distribution \(p(\omega_i)\).  (Remember the solid angle of a region on the hemisphere is just its surface area, treating the hemisphere as having unit radius.)
+
+<p>b.) If a ray starts from the point \((0, 0, z_0)\) with direction \((x_d, y_d, z_d)\), for what values of these coordinates does it hit the light?  Your answer is going to be inequalities joined with "and."
+
+<p>c.) Now that you have a procedure to generate samples (a), and a way to evaluate the integrand (b), repeat part (c) from problem 2 using this new strategy.  For which distances does the cosine-based sampling outperform the rectangle-based sampling?
+
+
+    <h3> Programming part</h3>
+    <p class="duedate">Due: December 3rd 2018 (11:59pm)</p>
+
+<p>In this assignment you will implement the core algorithms in a modern ray tracer.  We provide the low-level components&mdash;the BSDFs, the light sources, the geometry and ray tracing code&mdash;and you implement the Monte Carlo illumination computations.  Specifically, you will implement the subclasses of the abstract class <tt>Integrator</tt>.
+
+<p> The framework is now in the repository. It includes a ray-intersection acceleration structure using a Bounding Volume Hierarchy (BVH). As we did in Ray1, you will need go to modify the native library location to match with your OS. (Project → Properties → Java Build Path → Libraries → Select the openexrjni-3.0.0.jar dropdown menu → Modify Native Library Location. Also in Project -> Properties -> Java Build Path → Select Source → Select the a2/src. Drop Down Menu → Modify Native Library Location.)
+
+
+<h4>About the ray tracer</h4>
+
+<p>
+The ray tracer that is the framework for this assignment has an architecture typical of a modern production ray tracer.  It owes some aspects of its design to <a href="http://pbrt.org">PBRT</a> and <a href="http://www.mitsuba-renderer.org">Mitsuba</a>.  Many parts are similar to Ray 1, including the contents of ray2.camera, ray2.mesh, ray2.viewer, and the outer-loop and image I/O code in the ray2 package.  Like Ray 1 the default output format is the OpenEXR floating-point image format.
+
+<p>
+The way shading works is rather different, though.  Rather than having a shader associated with each surface in the scene&mdash;which amounts to writing a separate illumination algorithm for every type of material the renderer supports&mdash;we associate a BSDF with each material and pull the common rendering code into subclasses of <tt>Integrator</tt>.  Lights are also more general than in Ray 1, because we support area lights as well as point lights, and we support illumination from environments.  The packages that implement these pieces of the renderer are:
+<ul>
+	<li><tt>ray2.material</tt> contains <tt>BSDF</tt> and its subclasses, which are responsible for all calculations that are specific to particular material types.  There are just a few material types available: <tt>LambertianBSDF</tt> creates a diffuse surface; <tt>GlazedBSDF</tt> creates a surface with a diffuse and a mirror-like specular component; <tt>MicrofacetBSDF</tt> creates a surface with a diffuse and a soft specular component; and <tt>GlassBSDF</tt> creates a clear glass material.</li>
+	<li><tt>ray2.light</tt> contains <tt>Light</tt>, <tt>Environment</tt>, and their subclasses.  In addition to the familiar <tt>PointLight</tt>, there is also a rectangular area light <tt>RectangleLight</tt>.  Separately from Lights, there is the <tt>Environment</tt> interface, which is responsible for light that comes from an environment map, rather than from sources in the scene.  It has only one implementation, <tt>Cubemap</tt>.</li>
+	<li><tt>ray2.integrator</tt> contains <tt>Integrator</tt> and its subclasses.  Each integrator subclass implements a different algorithm for computing illumination on surfaces.  <tt>LightSamplingIntegrator</tt> works by generating samples on light sources, and <tt>BSDFSamplingIntegrator</tt> works by generating samples according to the surface's BSDF.
+</ul>
+<p>
+Integrators, lights, and environments are specified in the input XML by adding them as children of the scene.  When you are trying out the different integrators it is handy to switch from one integrator to another by changing the type in an <tt>&lt;integrator type="..."/&gt;</tt> tag at the outer level of the scene.  BSDFs can be created once and then referenced by name from many surfaces; see the input files for examples of how this works.
+
+<p>
+Check out the comments for <tt>BSDF</tt>, which explain how this class works.  You will need to understand this in order to use it in your illumination code.
+
+<p>
+Check out the comments for <tt>Light</tt> and <tt>Environment</tt>.  You'll also need to understand how these interfaces operate.
+
+<h4>The assignment</h4>
+
+<p>
+There are three parts to this assignment: one simple one to get started, and two corresponding to the two fundamental ways to sample illumination with Monte Carlo: using probability distributions that follow the BSDF of the surface, or using probability distributions that follow the distribution of incident light at the surface.  These two strategies are handled by the integrators <tt>LightSamplingIntegrator</tt> and <tt>BSDFSamplingIntegrator</tt>.  There is one warm-up step, to implement a simple Ray 1 style integrator called <tt>PointLightIntegrator</tt>.  And there is an extra credit step, which is to create the integrator <tt>MISIntegrator</tt> that intelligently combines the light sampling and BSDF sampling approaches to get (nearly) the best of both worlds.
+
+<p>
+    <strong>Step A:</strong> implement the point light integrator.  This one loops over all lights, checking to be sure they are point lights, and does the simple computation with BRDF and inverse-square attenuation.  It doesn't call Light.sample or BSDF.sample, and area lights and environments don't produce any illumination.  With this integrator you won't see reflections from glazed surfaces, and glass will just be black.  You will find a detailed description of the algorithm in the comment for <tt>PointLightIntegraor.shade()</tt>.
+
+<p> Test: To test the point light integrator, render the scenes in pointLight directory (bbox-test.xml, bunny-norms.xml, horse_norms.xml, /slow/bunny-norms-aa.xml) and compare the reference images in reference/ .
+
+<p>
+<strong>Step B:</strong> implement light source sampling.  This strategy considers lights one at a time and estimates the contribution of each, adding the estimates together.  For each light, it selects a single random sample and computes an estimator for the illumination integral from that source (an integral over area, like in written part 2).  It uses shadow rays to ensure it only includes light that would reach the shading point.  Point lights happen to be handled by the same computation: the point light always chooses the same location, and reports the probability of choosing that location as 1.
+
+<p>
+Separately from the light, light source sampling also estimates the contribution of the environment by selecting a single direction from the environment and computing an estimate of the contribution to reflected radiance.
+
+<p>
+    Light source sampling does not naturally include mirror-like reflections, because it's not possible to select a light source point or environment direction that exactly lines up with the reflection or refraction direction.  This has to be done by letting the material choose the direction, and a material with discrete components (that is, directions that have a finite probability of being selected, rather than just being part of a continuous range) lets us know it has chosen one of these directions by setting the <tt>isDiscrete</tt> flag.  So we can include sharp reflections and refractions by asking for a BSDF sample, then tracing a recursive ray only if it is a discrete sample.
+
+    <p>
+        You will find a detailed description of the algorithm in the comment for <tt>LightSamplingIntegrator.shade()</tt>.  When this step is done, many scenes will work well, but not reflections of large lights or environments in glossy surfaces.
+
+<p> Test: To test the light source sampling integrator, render the scenes in lightSampling directory.
+
+<p>
+    <strong>Step C:</strong> implement BSDF sampling.  This strategy doesn't think about individual lights; it just thinks of all lights plus the environment as providing an incident radiance field that illuminates the surface.  It uses just a single sample, drawn from the BSDF, evaluates the radiance in the chosen direction, and computes an estimate of the surface reflection integral (an integral over solid angle, like in written part 3).  The incident radiance is found by tracing a ray: if it hits a light, the light's radiance is the incident radiance; if it misses everything, the environment radiance is the incident radiance.  If the direction was chosen discretely, then we use a full recursive evaluation, so as to include interreflections for sharp reflections and refractions.
+
+    <p>
+    With BSDF sampling, discrete reflections and refractions are handled naturally, but point light sources are not.  So we need to also include the same computation done in the point light integrator, to include the contribution from these simple lights.
+
+    <p>
+        You will find a detailed description of the algorithm in the comment for <tt>BSDFSamplingIntegrator.shade()</tt>.  You should find that this integrator does well with very large light sources or smooth, soft lighting from environment maps like the uniform map or the Ufizzi gallery.  But it will be really noisy for scenes with smaller area sources.
+
+<p> Test: To test the BSDF sampling integrator, render the scenes in bsdfSampling directory.
+
+<p>
+<strong>Step D:</strong> Create at least one new input scene.  Feel free to use any meshes you like, and try to show off some of the capabilities of your program.  It doesn't need to be extremely elaborate if you are out of time, but we encourage you to have fun with it if you like! Please include in your README how we should render your new scene.
+
+<p>
+    <strong>Step E (for extra credit):</strong> If you are looking for an extra challenge after finishing the first three integrators, implement Multiple Importance Sampling.  The idea here is to use both of the previous strategies together.  For each source, rather than choosing from the BSDF distribution \(p_b\) or the light distribution \(p_l\), you choose a sample from each, find the incident radiance due to each, and then compute an estimate of reflected radiance by considering them both to be samples from the distribution \(\frac{1}{2}(p_b + p_l)\).  So if we chose the direction \(\omega_b\) with pdf \(p_b(\omega_b)\) and the direction \(\omega_l\) with pdf \(p_l\omega_l)\), instead of averaging the estimators
+    $$
+    L_i(\omega_b)\, f_r(\omega_b, \omega_r)\, (\omega_b\!\cdot\!\mathbf{n}) \,/\, p_b(\omega_b)
+    $$ and $$
+    L_i(\omega_l)\, f_r(\omega_l, \omega_r)\, (\omega_l\!\cdot\!\mathbf{n}) \,/\, p_l(\omega_l),
+    $$
+    which is what we get if we just follow the light sampling and BSDF sampling strategies separately, we instead use the estimators
+    $$
+    2 L_i(\omega_b)\, f_r(\omega_b, \omega_r)\, (\omega_b\!\cdot\!\mathbf{n}) \,/\, (p_b(\omega_b) + p_l(\omega_b))
+    $$ and $$
+    2 L_i(\omega_l)\, f_r(\omega_l, \omega_r)\, (\omega_l\!\cdot\!\mathbf{n}) \,/\, (p_l(\omega_l) + p_b(\omega_l)).
+    $$
+    Doing this requires knowing the pdf with which we <i>might have chosen</i> the light source sample from the BSDF, and vice versa; these can be computed using te <tt>pdf</tt> functions in each of the interfaces.
+
+    <p>
+        The MIS algorithm is a little more invovled, but it naturally includes both point lights and mirror reflections, which makes it a bit more elegant.  You should find that it is more robust than the previous two: in cases where one of those integrators performs poorly, MIS will be much better, though not always as good as the better of the two.
+    </p>
+
+<h4>What to Submit</h4>
+<p>Submit a zip file containing your solution organized the same way as the code on Github, along with your scene file and a full set of renderings of all the provided scenes that even partly work with your implementation.
+Include a readme in your zip that contains:
+<ul>
+  <li>You and your partner's names and NetIDs.
+  <li>Any problems with your solution.
+  <li>Anything else you want us to know.
+</ul>

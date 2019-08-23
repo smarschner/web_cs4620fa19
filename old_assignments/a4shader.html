@@ -1,0 +1,307 @@
+<!-- <h1><strong>PA 3: Scene</strong></h1> -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+ 
+</script>
+
+<p><strong>Do this project alone or in groups of two, as you prefer. </strong>You can use <a href="https://piazza.com/class/jd0ealxkqom6s8">Piazza</a> to help pair yourselves up.
+
+    <h3>Written Part</h3>
+    <h3><strong>Due: Friday October 12th 2018 (11:59pm)</strong></h3>
+    <!-- <hr/> -->
+
+    <h4>1. Displacement Mapping</h4>
+
+    <p>Displacement mapping involves computing new normals for the displaced surface, and the standard approach (which we use in the programming part) involves an approximation.  This problem explores when this approximation is accurate, looking at a 2D analog where the math is simpler to write down.</p>
+
+    <p>Suppose we have a 2D curve defined by a function:</p>
+    
+    \[p: [0,1] \rightarrow R^2\]
+
+    <p>and a displacement function defined:</p>
+
+    \[h: [0,1] \rightarrow R\]
+
+    <p>The (unnormalized) tangent vector to this curve is its derivative with respect to \(u\):</p>
+
+    \[t(u) = p'(u)\]
+
+    <p>and the (unnormalized) normal vector is:</p>
+
+    \[n(u) = R \: t(u)\]
+
+    <p>where R is a rotation by 90 degrees clockwise (this obeys the convention that "inside" is to the left as you walk along the curve, and the normal points towards the outside).</p>
+    
+    <p>The unit tangent is:</p>
+
+    \[\hat{t}(u) = \frac{t(u)}{\lVert t(u)\rVert}\]
+
+    <p>and the unit normal is: </p>
+
+    \[\hat{n}(u) = \frac{n(u)}{\lVert n(u) \rVert} = \frac{n(u)}{\lVert t(u) \rVert}\]
+
+
+    <p>We define a curve that is "p displaced along the normal by h" which is:</p>
+
+    \[p_d(u) = p(u) + h(u) \hat{n}(u)\]
+
+    <p>The (unnormalized) tangent vector to this curve is:</p>
+
+    \[p'_d(u) = p'(u) + h'(u) \hat{n}(u) + h(u) \hat{n}'(u)\]
+
+    <p>This last term is commonly discarded in practice, on the argument that we are usually applying small displacements to smooth curves, so \(h\) is small and \(\hat{n}^\prime\) (aka. curvature) is also small. The approximate tangent is:</p>
+
+    \[p'_{d}(u) = p'(u) + h'(u) \hat{n}(u)\]
+
+    <p>Let us see how this plays out in practice.</p>
+
+
+    <ol>
+    <li> Use the exact and approximate formulas to write two expressions for the unit normal to the displaced curve for the following particular curve and displacement function:
+    \[p(u) = (\cos(2\pi u), \sin(2\pi u))\]
+    \[h(u) = A \cos(40\pi u) + B\]
+    </li>
+
+    <li> Make pictures of the results by plotting the curve over the interval \(u \in [0.2, 0.3]\), and plotting the surface normals as short lines at regular intervals. Compare the pictures of both the exact and approximate normals for \(A = 1/20, B = 0\) and for \(A = 1/20, B = 5\). For which of these cases is the approximation a good one, and why? We recommend using MATLAB or Matplotlib to generate the images.</li>
+    </ol>
+
+    <h4>2. Reflection and Cube Maps</h4>
+    <p>Imagine that we would like to render a sphere under environment lighting. The sphere is centered at (0, 0, 0) and its radius is 1. The shader that does this will look up into an environment texture, using the <strong>direction</strong> of the reflected ray to compute the texture coordinates.  Suppose we have decided to use a cube map to represent the environment map, and we are using the common convention of packing the 6 faces of that map into a single texture that has the cube “unfolded” into a cross shape with width 300 texels and height 400 texels.</p>
+    <p><div style="text-align: center">
+        <img src="images/a4/cubemap.png" alt="" height="320" width="280" style="margin: 20px">
+    </div>
+    <p>A perspective camera is positioned at (0, 0, 2), viewing at (0, 0, 0). The following figure (not to scale) is a slice of the scene through the y-z plane, showing several viewing rays.</p>
+    <p><div style="text-align: center">
+        <img src="images/a4/YZprojection.png" alt="" height="300" style="margin: 20px">
+    </div>
+    <p>Which parts of the cube map could be sampled by reflections from the sphere? Draw the region on the cross and mark your sketch with enough positions and dimensions (in texel units) so that it’s clear exactly what region is shaded. You can round your answer to the nearest integer texel unit. We are providing the following cube map diagram in <a href='images/a4/a4-written-2-answersheet.pdf'>PDF format</a>--mark it up either electronically or by printing and drawing on it.</p>
+    <p><div style="text-align: center">
+        <img src="images/a4/draw.png" alt="" height="320" width="280" style="margin: 20px">
+    </div>
+
+    <h4>What to Submit</h4>
+    <p>Submit a PDF file containing Q1 and Q2 together.
+
+    <br>
+
+    <h3>Programming Part</h3>
+    <h3><strong>Due: Wednesday October 17th 2018 (11:59pm)</strong></h3>
+
+    <h4>Overview</h4>
+
+    <p>In this assignment, you will implement some shaders in GLSL, a graphics-specific language that lets you write programs that run on the graphics processor (GPU).
+
+    There are four main components to the assignment:
+    <ol>
+    <li>Implement a microfacet shader in <tt>microfacet.html</tt>.</li>
+    <li>Implement specular (mirror-like) reflection under environment lighting in <tt>environment.html</tt>.</li>
+    <li>Implement a displacement mapping shader (without environment mapping) in <tt>displacement-bump.html</tt>.</li>
+    <li>Implement a bump mapping shader (also without environment mapping) in <tt>displacement-bump.html</tt> and compare results with displacement mapping.</li>
+    </ol>
+
+    <p>Each part is contained in its own webpage, which includes a framework based on the mesh viewer you saw in Assignment 1 (Mesh). This will allow you to load any meshes and textures you might like to test with. All of the work outside of the shaders themselves has been done for you, but be sure to understand what uniforms and attributes are being passed to your GLSL program. Some of the uniforms may be controlled using a slider on the webpage.
+
+    <p>The shaders are embedded in the HTML documents themselves. You will edit and submit these directly. We have marked all the shaders you need to write with <tt>// TODO#A4</tt> in the source code.
+
+    <p>A few test meshes and textures have been provided in the <tt>data</tt> directory.
+
+    <h4>Example: Phong Shader</h4>
+
+    <p>We have provided an example in <tt>phong.html</tt>. You do not need to modify this file, but it may be useful as a reference. Note the built-in uniforms and attributes provided by Three.js as well those we have provided via Javascript. Uniforms include the model, view, and projection matrices. Attributes include vertex positions and normals (in local object space). See also how the "Roughness" slider changes the <tt>roughness</tt> uniform with a corresponding change in the rendering. (This is the inverse of the Phong exponent; we have chosen to display it this way so that moving the slider to the right has a similar effect to doing the same with the microfacet shader.)
+
+    <p>Also note how the lights are handled. There is one uniform array for the positions and another for the colors. The constant <tt>NUM_LIGHTS</tt> gives the number of lights.
+
+    <p>Note that this example performs the bulk of its computations in eye space, as this is the most convenient for the provided set of built-in uniforms. We recommend you do the same. Similarly, while we have provided a toggle between fixing light positions to world space and fixing light positions to eye space, in the shader the light position uniforms will always be provided in eye space.
+
+
+<h4>Problem 1: Microfacet Shader</h4>
+
+<div class="thumbnails" style="text-align: center">
+    <img src="images/a4/microfacet_reference.jpg" alt="">
+</div>
+
+<p>The Blinn-Phong shading implemented in the example shader gives OK results -- but it's far from the reality of light reflection. For more realistic appearance, we should use more sophisticated models based on the microfacet framework (like the one used in the Ray 1 extra credit).
+
+<p>You will implement a microfacet-based lighting model that includes diffuse reflection and also models light that reflects specularly from the top surface of the material. The microfacet model you're required to implement uses the Beckmann distribution to model the roughness of the surface. You are supposed to implement the overall fragment shader, but we are providing implementations of the \(F\), \(D\), and \(G\) functions.
+
+
+This model is defined in terms of its bidirectional reflectance distribution function (BRDF), and the shading equation for a single light source is as follows:
+  <ul style="list-style: none; text-align: center;">
+    \[\frac{I_L}{r^2} \;\left(\frac{R_d}{\pi} + R_m\;f_r(\omega_i, \omega_o, n)\right) \max ( n \cdot \omega_i , 0 ) \]
+  </ul>
+These computations should be repeated for each visible light in the scene and the contributions summed. </p>
+
+  The term in parentheses is the full BRDF of the surface, including the Lambertian BRDF (which is a constant, since diffuse reflection sends light equally in all directions) and the specular BRDF \(f_r\). 
+
+  You will need to look up the diffuse reflectance \(R_d\) in <tt>uniform sampler2D diffuseTexture</tt>, which you can do using the <tt>texture2D</tt> function that is built into GLSL.
+
+  Its specular reflectance \(R_m\) represents the fraction of light reflected by specular component in each color channel, and it is set to 1 in this case. And the value of function \(f_r(\omega_i, \omega_o, n)\) here is a number (scalar-valued). \(I_L\) is the color of the light in the <tt>lightColors</tt> array.
+
+  The specific microfacet model we use comes from <a href="https://www.graphics.cornell.edu/~bjw/microfacetbsdf.pdf">this paper</a> and is the product of several factors:
+  <ul style="list-style: none; text-align: center;">
+    \[ f_r(\omega_i,\omega_o,n) \; =  \; \frac{F(\omega_i,h)G(\omega_i,\omega_o,h)D(h)}{4|\omega_i \cdot n| |\omega_o \cdot n|} \]
+  </ul>
+
+  <p><tt>\(\omega_i\)</tt>: Direction unit vector along incoming ray.</p>
+  <p><tt>\(\omega_o\)</tt>: Direction unit vector along outgoing ray.</p>
+  <p><tt>\(n\)</tt>: unit normal vector of surface at the shaded point.</p>
+  <p><tt>\(h\)</tt>: normalized half vector of \(\omega_i\) and \(\omega_o\):
+  <ul style="list-style: none; text-align: center;">
+    \[  h(\omega_i, \omega_o) \; = \; \frac{\omega_i + \omega_o}{|\omega_i + \omega_o|} \]
+  </ul>
+  </p>
+
+  <p>The three terms \(F\), \(D\), and \(G\) are the Fresnel factor, the slope distribution, and the shadowing/masking factor, and their particulars are given below. We have already implemented the three functions for you; the following is for reference.
+
+  <ul>
+  <li><tt>\(F(\omega_i,h)\)</tt>: This is the Fresnel term for unpolarized light, and only reflection (not refraction) is considered in this assignment.
+  <ul style="list-style: none; text-align: center;">
+    \[ F(\omega_i, h) \; = \; \frac{1}{2}\frac{(g-c)^2}{(g+c)^2}\left(1 \; + \; \frac{(c(g+c)-1)^2}{(c(g-c)+1)^2}\right)\]
+  </ul>
+  where \(g \; = \; \sqrt{\frac{n_t^2}{n_i^2}-1+c^2}\) and \(c \; = \; |\omega_i \cdot h|\). \(n_t\) and \(n_i\) are the refractive index of material and air respectively. \(n_i\;=\;1.0\). Note that when computing the value of \(g\), it is possible to encounter a neagive number under the square root in some edge cases.  In this case, \(F\;=\;1\).
+  </li>
+
+  <li><tt>\(D(h)\)</tt>: This factor comes from the microfacet distribution function. We use the Beckmann distribution.
+  <ul style="list-style: none; text-align: center;">
+    \[ D(h) \; = \; \frac{\chi^{+}(h \cdot n)}{\pi\alpha_b^2\cos^4\theta_h} \; \exp\left(\frac{-\tan^2\theta_h}{\alpha_b^2}\right) \]
+  </ul>
+  where \(\theta_h\) denotes the angle between \(h\) and \(n\); \(\chi^{+}(a)\) is the positive characteristic function (one if \(a>0\) and zero if \(a \leq 0\) ). \(\alpha_b\) is the width parameter of the Beckmann distribution and can be controlled by the slider at the top.
+  </li>
+
+  <li>
+  <tt>\(G(\omega_i,\omega_o,h)\)</tt>: This is the Smith shadowing-masking term; it is designed based on the choice of microfacet distribution function \(D(h)\). For 
+  the Beckmann model, we use a rational approximation calculated by Walter et al.  \(G(\omega_i, \omega_o,h)\) can be separated as the product of two parts:
+  <ul style="list-style: none; text-align: center;">
+    \[ G(\omega_i, \omega_o, h) = G_1(\omega_i,h)G_1(\omega_o,h) \]
+  </ul>
+  For Beckmann distribution,
+  <ul style="list-style: none; text-align: center;">
+    \[ 
+    G_1(v,h) \; = \; \chi^{+}\left(\frac{v\cdot h}{v\cdot n}\right)
+    \begin{cases}
+    \frac{3.535a\;+\;2.181a^2}{1\;+\;2.276a\;+\;2.577a^2}, & \text{if}\ a < 1.6 \\
+    1 & \text{otherwise}
+    \end{cases}
+     \]
+  </ul>
+  where \(a=(\alpha_b\tan\theta_v)^{-1}\) and \(\theta_v\) is the angle between \(v\) and \(n\).
+</li>
+</ul>
+<p>Implement the shading equation in <tt>fragmentShader</tt> in <tt>microfacet.html</tt>. Use <tt>vertexShader</tt> to pass any data you will need to the fragment shader.</p>
+
+
+<h4>Problem 2: Environment Mapping</h4>
+
+<div class="thumbnails" style="text-align: center">
+    <img src="images/a4/environment_reference.jpg" alt="">
+</div>
+
+<p>You used point lights in the Raytracer and Scene assignments. Real world scenes
+usually have much more complex lighting conditions than that and environment
+mapping is a clever technique to capture complex lighting in a texture. The
+idea of an environment map is that the illumination from the environment
+depends on which direction you look, and an environment map is simply a texture
+you look up by direction to answer the question "how much light do we see if
+we look in that direction?". Your task here is to implement specular reflection
+under a given environment map.
+
+<p>In OpenGL, there is a special kind of texture called a cube map, which
+stores images of the distant environment. A cube map consists of six faces, and
+each of them has a 2D texture that shows the environment viewed in perspective through one face of the cube. You can sample a cubemap with a 3D vector in order to get environment light intensity
+in the direction that vector is pointing. See section 11.6 of the book. 
+
+<p>In this assignment we have already loaded a cubemap for you as <tt>uniform samplerCube environmentMap</tt>. 
+Similarly to a 2D texture, you can look up into a cube using the <tt>textureCube</tt> function that is built into GLSL.
+
+<p>Your task is to implement specular reflection under environment lighting. Given a viewing direction and a normal direction, we can follow the written part (i.e., Mirror Reflection) to compute the reflection direction, and then use it to sample the cube map. You may assume the environment map is fixed in eye space; i.e. the mouse rotates the scene relative to the environment map, but the environment map remains fixed relative to the camera. Implement the <tt>vertexShader</tt> and <tt>fragmentShader</tt> in <tt>environment.html</tt>.
+
+<p>
+Given the way this problem loads textures, you will likely need to run a server due to security restrictions. An easy way to do this is to install <a href=https://www.python.org>Python</a> if you do not already have it and run from your project directory the following command that corresponds to your Python version:
+<ul>
+<li>Python 2: <tt>python -m SimpleHTTPServer 8000</tt></li>
+<li>Python 3: <tt>python -m http.server 8000</tt></li>
+</ul>
+Once the server is running, visit <a href=http://localhost:8000/environment.html><tt>http://localhost:8000/environment.html</tt></a>.
+</p>
+
+<h4>Problem 3: Displacement mapping</h4>
+
+<div class="thumbnails" style="text-align: center">
+    <img src="images/a4/displacement_reference_earth.jpg" alt="">
+    <img src="images/a4/displacement_reference_square.jpg" alt="">
+</div>
+
+<p>Building complex shapes in 3D is hard work, but one easy-to-use modeling tool that is good for adding detail to a smooth surface is displacement mapping.  The idea is to use a height function \(h(u,v)\) whose graph is a height field that shows the details you'd like, store it in an image, use texture coordinates to establish \((u,v)\) coordinates on the surface, and then displace each point of the surface along the surface normal at that point according to the height function.</p>
+
+<p>In equations, given a parametric surface defined by a function</p>
+
+\[p : \mathbb{R}^2 \rightarrow \mathbb{R}^3\]
+
+<p>We can define the displaced surface by, for any given \((u,v)\), moving the point \(p(u,v)\) along the normal according to \(h(u,v)\):</p>
+
+\[p_d(u,v) = p(u,v) + \alpha * h(u,v) * \hat{n}(u,v)\]
+
+
+<p>where \(\hat{n}\) is the unit normal vector to the surface at \(p(u,v)\) and \(\alpha\) is a scale factor used to control how strong a displacement to apply.  In this part of the assignment we will implement a vertex shader that displaces a surface defined by a triangle mesh according to this scheme.</p>
+
+<p>In a vertex shader it is simple to compute the displaced position of a vertex, since \(p(u,v)\) and \(\hat{n}(u,v)\) are given as vertex attributes, and \(h(u,v)\) can be obtained by a texture lookup.  However, as you'll gather from the first written problem in this assignment, displacing the surface also changes the normal to the surface, and this has a very important effect on shading.</p>
+
+<p>The derivation of the normal to a displaced surface in 3D is much like the curve in 2D from that earlier problem; it just has two partial derivatives instead of one.  To compute the normal to the surface defined by \(p\), we can compute two tangent vectors:</p>
+
+\[\frac{\partial p}{\partial u} (u,v) \qquad \text{and} \qquad \frac{\partial p}{\partial v} (u,v)\]
+
+<p>These are both perpendicular to the surface normal, so as long as they are not parallel (which would imply our surface is not really a surface) their cross product is the surface normal.  And if we can work out the tangents to the displaced surface, we can also compute the normal to the displaced surface.</p>
+
+<p>The derivatives of the surface defined by \(p_d\) are:</p>
+
+\[t_u(u,v) = \frac{\partial p_d}{\partial u} = \frac{\partial p}{\partial u} + \alpha \frac{\partial h}{\partial u} \hat{n} + \alpha h \frac{\partial \hat{n}}{\partial u}\]
+\[t_v(u,v) = \frac{\partial p_d}{\partial v} = \frac{\partial p}{\partial v}+ \alpha \frac{\partial h}{\partial v} \hat{n} + \alpha h \frac{\partial \hat{n}}{\partial v}\]
+
+
+<p>The derivative of \(\hat{n}\) (a quantity related to the curvature of the surface) is actually pretty complex to compute, but that's OK, because we'll assume that \(h\) is small and/or curvature is low as an excuse for discarding that last term, leaving us with:
+
+\[t_u(u,v) = \frac{\partial p}{\partial u} + \alpha \frac{\partial h}{\partial u} \hat{n}\]
+\[t_v(u,v) = \frac{\partial p}{\partial v} + \alpha \frac{\partial h}{\partial v} \hat{n}\]
+
+<p>and we can compute the displaced normal as</p>
+
+\[\hat{n}_d(u,v) = t_u(u,v) \times t_v(u,v)\]
+
+<p>In order to do this computation in a vertex shader, we need to have the (non-unit) tangents \(\frac{\partial p}{\partial u}\) and \(\frac{\partial p}{\partial v}\) available. You can't compute them in isolation at a vertex from the usual point, normal, and texture coordinates, because these derivatives are about how the position and texture coordinates change across the surface.  For this reason, these tangents need to be computed from the mesh and passed as vertex attributes, alongside the position, normal, and texture coordinates.</p>
+
+<p>In this assignment, the computation of the attributes <tt>derivU</tt> and <tt>derivV</tt> is handled by the framework (the code is in <tt>js/BufferGeometryUtils.js</tt>) by computing these tangents per-triangle and averaging them at vertices using the algorithm described <a href=http://www.terathon.com/code/tangent.html>here</a>.</p>
+
+<p>To calculate \(\frac{\partial h}{\partial u}\) and \(\frac{\partial h}{\partial v}\), you will need to approximate the partial derivatives of a texture. You can use a finite difference approximation to do so, which for the partial derivative with respect to \(u\) is:</p>
+
+\[\frac{\partial h(u,v)}{\partial u} = \frac{h(u+ \Delta u, v) - h(u - \Delta u, v)}{2 \Delta u}\]
+
+<p>where \(\Delta u\) is a small change in \(u\). It is important to choose a \(\Delta u\) that is small enough to capture local differences but large enough to sample the height at neighboring texels. A value of 0.001 for both \(\Delta u\) and \(\Delta v\) will work for the examples in this assignment.</p>
+
+<p>For this problem you'll find all the work happens in the vertex shader; the fragment shader can remain entirely unchanged from the basic Phong shading implementation. Implement the shaders marked <tt>vertexShader</tt> and <tt>fragmentShader</tt> in <tt>displacement-bump.html</tt>. In the vertex shader, compute the displaced vertex position and store it in <tt>gl_Position</tt>. Also compute the displaced unit normal to the displaced surface, and store it in <tt>vNormal</tt>.</p>
+
+
+
+<p>You can test your implementation on this model and height map:</p>
+<ul>
+<li>Higher-resolution map of the Earth: mesh: <tt>data/meshes/sphere_highres.obj</tt>; texture: <tt>data/textures/earthmap1k.jpg</tt>; displacement map: <tt>data/textures/earthbump1k.jpg</tt>
+<li>Sine wave: mesh: <tt>data/meshes/square.obj</tt>; texture: none; displacement map: <tt>data/textures/sinbump1k.jpg</tt></li>
+</ul>
+
+
+<h4>Problem 4: Bump mapping</h4>
+
+<div class="thumbnails" style="text-align: center">
+    <img src="images/a4/bump_reference_earth_lowres.jpg" alt="">
+</div>
+
+<p>Displacement mapping is great, but it requires a dense mesh to work; sometimes this can be too many triangles, leading to too slow performance.  But of the two things our displacement shader changes--the vertex position and the vertex normal--it's the normal that has the biggest effect on surface appearance when displacements are small.  This leads to the idea of not bothering with displacement, but still using the normal to the displaced surface for shading.</p>
+
+<p>This technique is known as bump mapping.  The idea is to use a low resolution surface, and carry out the displacement normal computation at the fragment stage, so that the normal used for shading varies from fragment to fragment across a triangle.</p>
+
+<p>For this last problem, take the normal-vector computation you implemented for displacement mapping and move it to the fragment shader.  The vertex shader doesn't have to do much; just transform the position, normal, and tangents to world space and pass them as varyings. Implement the shaders marked <tt>bumpVertexShader</tt> and <tt>bumpFragmentShader</tt> in <tt>displacement-bump.html</tt>. You can toggle between displacement mapping and bump mapping using the control toward the top of the screen.</p>
+
+<p>You can test your implementation on these sets of models and height maps:</p>
+<ul>
+<li>Higher-resolution map of the Earth: mesh: <tt>data/meshes/sphere_highres.obj</tt>; texture: <tt>data/textures/earthmap1k.jpg</tt>; displacement map: <tt>data/textures/earthbump1k.jpg</tt>
+<li>Lower-resolution map of the Earth: mesh: <tt>data/meshes/sphere.obj</tt>; texture: <tt>data/textures/earthmap1k.jpg</tt>; displacement map: <tt>data/textures/earthbump1k.jpg</tt></li>
+</ul>

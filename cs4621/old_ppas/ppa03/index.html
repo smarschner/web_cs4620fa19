@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>CS 4621: PPA3 -- Maze Crawler</title>
+
+    <!-- Bootstrap -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/cs4620.css" rel="stylesheet">
+    <link href="../css/jquery-ui.min.css" rel="stylesheet">
+    <link href="../css/jquery-ui.theme.min.css" rel="stylesheet">
+    <link href="../css/jquery-ui.structure.min.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+    });
+
+
+    </script>
+    <!-- MathJax -->
+    <script type="text/javascript" async
+            src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>CS 4621 PPA3 <span class="subtitle">Maze Crawler</span></h1>
+    <p class="courseinfo">Out: Friday March 16, 2018</p>
+    <p class="courseinfo">Due: Friday March 30, 2018 at 11:59pm</p>
+    <p class="courseinfo">Work in groups of up to 4.</p>
+
+    <h2>Overview</h2>
+
+    <p>
+        In this programming assignment, you will implement a simple maze crawler.
+        The user will traverse through a virtual maze that is built dynamically from textual input. The maze will be
+        displayed from a first-person perspective. When the user presses the arrow keys, this triggers an animation
+        which moves the user to discrete positions within the maze.
+    </p>
+
+    <h2>Demonstration</h2>
+
+    <center>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/iqC6CO3VdsM" frameborder="0" allowfullscreen></iframe>
+    </center>
+    <small>
+        Note that this video was recorded by Pramook Khungurn for the Spring 2017 version of this class. The assignment
+        has changed in places, but everything in this video is up to date.
+    </small>
+
+    <h2>Logistics</h2>
+
+    <p>
+        First, download the <a href="ppa03_framework.zip">framework code</a>. We recommend creating a git repository for
+        development, but <b>please don't share your code publicly.</b>
+    </p>
+
+    <p>
+        Inside the directory, open <code>index.html</code>, and you should see a web page with a black canvas 
+        and some controls.
+    </p>
+
+    <p>
+        Please modify <code>index.html</code> so that it implements a maze crawler with behavior that is similar
+        to the one in the video. You may also add other code to the directory. However, do not use any 3D rendering
+        frameworks such as <a href="https://threejs.org/">three.js</a>. Linear algebra libraries such as
+        <a href="http://glmatrix.net/">glMatrix</a> and convenience libraries such as 
+        <a href="http://jquery.com/">jQuery</a> and <a href="http://www.createjs.com/preloadjs">PreloadJS</a>
+        are fine.  In fact, we have included these in the distributed framework code.
+    </p>
+
+    <p>
+        Once you're done writing your solution, ZIP the directory, and submit
+        the ZIP file to CMS.
+    </p>
+
+
+    <h2>Maze Specification</h2>
+
+    <p>
+        A maze is a <i>rectangular</i> grid divided into equally sized cells.  A cell is a square in
+        the $xy$-plane whose size is $1 \times 1$ (in some unit of distance).  There are two types of cells: <b>walkable</b>
+        and <b>unwalkable</b>.  If a walkable cell is adjacent to an unwalkable cell, there must be a vertical
+        wall on their common cell edge.  A vertical wall is also a square with a size of $1 \times 1$.
+        One of its dimension is the $z$-axis, which is our vertical axis.</p>
+    <p>
+        A maze is specified by its text representation that is entered into the "Maze" text area in
+        <code>index.html</code>.  The text representation may contain the following types of characters:
+    </p>
+
+    <ul>
+        <li>A newline character; i.e. <code>\n</code>.</li>
+        <li>The pound character <code>#</code>, representing an unwalkable cell.</li>
+        <li>The dot character <code>.</code>, representing a walkable cell.</li>
+        <li>
+            A directional character, <code>N</code>, <code>E</code>, <code>W</code>, or <code>S</code>,
+            representing a walkable cell in which the camera starts.  These four characters represent
+            the initial "heading" of the camera.  The heading is the 2D direction in the $xy$-plane of the
+            view direction.  It is specified as the angle the view vector makes with the
+            positive $x$-axis.
+            <ul>
+                <li><code>N</code> is the "north" direction $(0,1,0)$ and the heading is $\pi/2$.</li>
+                <li><code>E</code> is the "east" direction $(1,0,0)$ and the heading is $0$.</li>
+                <li><code>W</code> is the "west" direction $(-1,0,0)$ and the heading is $\pi$.</li>
+                <li><code>S</code> is the "south" direction $(0,-1,0)$ and the heading is $3\pi/2$.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <p>
+        A valid string representation must satisfy the following conditions:
+    </p>
+    <ol>
+        <li>
+            The characters must form a rectangle.  In other words, every line of the string must have
+            the same number of characters.
+        </li>
+        <li>
+            Every character of the border of the rectangle must be <code>#</code>.
+        </li>
+        <li>
+            There is exactly one directional character in the string.
+        </li>
+    </ol>
+
+    <p>The template code has a function that checks the above conditions.  If one of them is not satisfied,
+    the code will throw an exception, and the program will stop.  As a result, you don't have to worry
+    about these cases when you program, but you should keep them in mind when editing the string representation
+    to test your program.</p>
+
+    <p>
+        The string representation shows what the maze looks like when viewed from above (i.e.
+        from where the $z$-coordinate is high).  If the string representation has $h$ rows and
+        $w$ (non-whitespace) characters in each row, then there are $w \times h$ cells in the maze,
+        and the maze should occupy the rectangle $[0,w] \times [0,h]$ in the $xy$-plane.
+        The character at the bottom left corner of the string representation corresponds to the cell
+        whose bottom left corner is at $(x,y) = (0,0)$.  The character at the top right corresponds to
+        the cell whose bottom left corner is $(x,y) = (w-1,h-1)$.
+    </p>
+
+    <p>
+        From now on, we will refer to the cell that occupies the rectangle $[a,a+1] \times [b,b+1]$ in the
+        $xy$-plane as the $(a,b)$-cell.
+    </p>
+
+    <h2>Program Specification</h2>
+
+    <h3>Position at Rest</h3>
+    <p>
+        When the camera is not moving to another cell (as a response to keyboard input),
+        it should be located at the middle point of a walkable cell.  In other words, the $xy$-position of the
+        camera should be at $(a+0.5,b+0.5)$ where $(a,b)$ is a walkable cell.
+    </p>
+
+    <h3>Heading at Rest</h3>
+    <p>
+        When the camera is not turning, its heading should be equivalent to $0$, $\pi/2$,
+        $\pi$, or $3\pi/2$ radians. In other words, when stationary, the camera should always be facing north, east, west, or south.
+    </p>
+
+    <h3>Changing Position</h3>
+
+    <p>
+        When the user presses the up arrow key, the camera should move to the cell in the direction of the current
+        camera heading if it is walkable. If the cell in that direction is not walkable (i.e., the camera is facing a wall),
+        the camera should not move.
+    </p>
+
+    <p>
+        The canvas should show a smooth transition to the new location. To implement this, you can define an
+        animation duration (a quarter of a second or so) during which the camera position linearly interpolates
+        between the old position and the new position. During this transition period, all keystrokes and
+        user interaction can be ignored.
+    </p>
+
+    <p>
+        The program should exhibit similar behavior when the down arrow key is pressed.  However,
+        the camera should move backward instead of forward.
+    </p>
+
+    <h3>Changing Heading</h3>
+
+    <p>
+        When the user presses the left arrow key, the camera should increase its heading by $\pi/2$ radians.
+        The canvas should show a smooth transition, interpolating between the old heading
+        and the new heading over some animation period. Once again, all input during this animation can be ignored.
+    </p>
+
+    <p>
+        The system should exhibit similar behavior when the right arrow key is pressed.  However,
+        the heading should decrease by $\pi/2$ radians instead of increasing by that amount.
+    </p>
+
+    <h3>Camera's Height</h3>
+
+    <p>
+        The $z$-position of the camera's position should be specified by the value in the
+        "Eye height" spinner. A height of 0 would mean that the camera is touching the ground
+        plane, and a height if 1 would mean that the camera is aligned with the top of the walls.
+        Use the provided <code>getEyeHeight()</code> method to access this value. Call this function every frame.
+    </p>
+
+    <h3>Camera's Field of View</h3>
+
+    <p>
+        When constructing the projection matrix, its field of view (in degrees) should be specified
+        by the value in the "Field of view" spinner. This is the field of view of the vertical ($y$)
+        opening of the frustum. Use the provided <code>getFOV()</code> method to access this value,
+        which is converted to radians automatically. Call this function every frame.
+    </p>
+
+    <h2>Implementation Details</h2>
+
+    <h3>Textures</h3>
+
+    <p>
+        We have provided textures to use to indicate the floor and the wall in the <code>data/</code>
+        folder:
+    </p>
+    <table class="table table-bordered">
+        <tr>
+            <td align="center">
+                <img width="300" src="../ppa03_student/data/floor.jpg" >
+            </td>
+            <td align="center">
+                <img width="300" src="../ppa03_student/data/wall.jpg" >
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <code>ppa03_student/data/floor.jpg</code>
+                <a href="https://opengameart.org/content/tilling-textures-pack-02">(Source)</a>
+            </td>
+            <td align="center">
+                <code>ppa03_student/data/wall.jpg</code>
+                <a href="https://opengameart.org/content/free-tilling-textures-pack-29">(Source)</a>
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        We obtained these textures from <a href="http://opengameart.org/">OpenGameArt</a>.  They are created
+        by <a href="https://opengameart.org/users/yughues">yughues</a> and are listed as belonging to the
+        public domain.
+    </p>
+
+    <h3>Sky Color</h3>
+
+    <p>
+        The sky color we used is RGB = $(0.3, 0.7, 1.0)$.  You don't have to use the exact same color,
+        but choose a color that clearly delineates the background.
+    </p>
+
+    <h3>Maze Data Structure</h3>
+
+    <p>
+        The template code has a global variable called <code>maze</code> that is updated every time
+        the "Update Maze" button is clicked.  The variable contains an object which the following fields:
+    </p>
+
+    <ul>
+        <li><code>sizeX</code> = the number of cells in the $x$-direction.</li>
+        <li><code>sizeY</code> = the number of cells in the $y$-direction.</li>
+        <li><code>startHeading</code> = the initial heading of the camera in radians.</li>
+        <li><code>startPosition</code> = a two-element array containing the integer coordinates of the initial cell.</li>
+        <li>
+            <code>data</code> = a two-dimensional array containing integers which indicate
+            whether the cells are walkable or unwalkable.
+            <ul>
+                <li>If <code>data[x][y] = 0</code>, then the $(x,y)$-cell is walkable.</li>
+                <li>If <code>data[x][y] = 1</code>, then the $(x,y)$-cell is unwalkable.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h3>Perspective Matrix</h3>
+
+    <p>
+        You will need to create a perspective matrix to display the 3D geometry. See
+        <a href="../lecture06/exhibit07.html">Lecture 6 Exhibit 7</a> for an example. It may help to know
+        that the canvas width will always be 800 pixels and the canvas height will always be 600 pixels.
+        You can assume that nothing in the scene will be closer to the camera that 0.1 units and nothing
+        will be further away than 100 units.
+    </p>
+
+    <h2>Additional Features</h2>
+
+    <p>
+        In order to receive full credit, you must implement at least one other feature beyond what is
+        specified above. The amount of points you will receive depends on the effort spent on extra
+        features. Implementing many features, or implementing an especially impressive feature, may earn extra credit.
+        Some ideas for extra features are listed below.
+    </p>
+
+    <ul>
+        <li>
+            <b>Better shading:</b>  The reference solution just displays the wall and floor textures without
+            any modification.  Implement shading with normal mapping as you did in A4.  You can find the normal maps
+            of the textures in the "Source" links above.  You have the freedom of choosing the positions
+            of the light sources, but make sure that all walls and every part of the floor are lit.
+        </li>
+
+        <li>
+            <b>Sky box:</b>  A solid color is a bland choice for a sky.  Implement a fancier sky box using some textures
+            that can be found <a href="https://opengameart.org/art-search?keys=skybox">here</a>, or create your own sky model
+            using the techniques you used in PPA2. WebGL's support for cubemaps may be useful here.
+        </li>
+
+        <li>
+            <b>Objects:</b>  Treasure boxes.  Gems and gold pieces.  Zombies.  You name it.
+            Modify the string representation parser so that these objects can be placed in the scene by modifying
+            the string representation. For an additional challenge, add animation effects to these objects.
+        </li>
+
+        <li><b>Smooth animation:</b> Instead of linearly interpolating camera positions and orientations, use a
+            different interpolation scheme that smoothly transitions between the endpoints of the animations.
+            Referencing the 4620 lectures on splines may be useful here.
+        </li>
+
+        <li>
+            Come up with your own idea. If you want to try something but are unsure of how to implement it, please consult the course staff.
+        </li>
+    </ul>
+
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="../js/jquery-3.1.1.min.js"></script>
+<script src="../js/jquery-ui.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="../js/bootstrap.min.js"></script>
+<!-- Google Code Prettifier -->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+
+</body>
+</html>

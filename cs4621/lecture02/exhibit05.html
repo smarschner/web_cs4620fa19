@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>CS 4621: Lecture 2 -- Exhibit #5: Varying Variables</title>
+
+    <!-- Bootstrap -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" href="../css/jquery-ui.min.css">
+
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+    });
+    </script>
+    <!-- MathJax -->
+    <script type="text/javascript" async
+            src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>Exhibit #5: Varying Variables</h1>
+
+    <canvas id="webglCanvas" style="border: none; background-color: black;" width="512" height="512"></canvas>
+
+    <h2>What We Did</h2>
+
+    <ul>
+        <li>The vertex shader can pass information to the fragment shader through <i>varying variables.</i></li>
+        <li>Declaration: <code>varying &lt;type&gt; &lt;name&gt;;</code>
+            <ul>
+                <li>You have to declare the same variable inside both the vertex shader and fragment shader.</li>
+            </ul>
+        </li>
+        <li>The vertex shader should set the varying variable, and the fragment shader can use it.
+<pre class="prettyprint"><code class="language-glsl">// Vertex shader code
+attribute vec3 vert_position;
+attribute vec3 vert_color;
+
+varying vec3 geom_color;
+
+void main() {
+    gl_Position = vec4(vert_position, 1.0);
+    geom_color = vert_color;
+}
+</code></pre>
+<pre class="prettyprint"><code class="language-glsl">// Fragment shader code
+precision highp float;
+
+varying vec3 geom_color;
+
+void main() {
+    gl_FragColor = vec4(geom_color, 1.0);
+}
+</code></pre>
+        </li>
+        <li><b>Important:</b> Value of a varying variable is <i>interpolated</i> along the primitives.
+            <ul>
+                <li>This allows us to do a lot of cool things.</li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="../js/jquery-3.1.1.min.js"></script>
+<script src="../js/jquery-ui.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="../js/bootstrap.min.js"></script>
+<!-- Google Code Prettifier -->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+
+<script id="vertexShader" type="x-shader/x-vertex">
+    attribute vec3 vert_position;
+    attribute vec3 vert_color;
+
+    varying vec3 geom_color;
+
+    void main() {
+        gl_Position = vec4(vert_position, 1.0);
+        geom_color = vert_color;
+    }
+</script>
+
+<script id="fragmentShader" type="x-shader/x-fragment">
+    precision highp float;
+
+    varying vec3 geom_color;
+
+    void main() {
+        gl_FragColor = vec4(geom_color, 1.0);
+    }
+</script>
+
+<script>
+    function initializeWebGL(canvasName) {
+        var canvas = $("#" + canvasName);
+        // Getting WebGL context the right way
+        var gl = null;
+        try {
+            gl = canvas[0].getContext("experimental-webgl");
+            if (!gl) {
+                gl = canvas[0].getContext("webgl");
+            }
+        } catch (error) {
+            // NO-OP
+        }
+        if (!gl) {
+            alert("Could not get WebGL context!");
+            throw new Error("Could not get WebGL context!");
+        }
+        return gl;
+    }
+
+    function createShader(gl, shaderScriptId) {
+        var shaderScript = $("#" + shaderScriptId);
+        var shaderSource = shaderScript[0].text;
+        var shaderType = null;
+        if (shaderScript[0].type == "x-shader/x-vertex") {
+            shaderType = gl.VERTEX_SHADER;
+        } else if (shaderScript[0].type == "x-shader/x-fragment") {
+            shaderType = gl.FRAGMENT_SHADER;
+        } else {
+            throw new Error("Invalid shader type: " + shaderScript[0].type)
+        }
+        var shader = gl.createShader(shaderType);
+        gl.shaderSource(shader, shaderSource);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            var infoLog = gl.getShaderInfoLog(shader);
+            gl.deleteShader(shader);
+            throw new Error("An error occurred compiling the shader: " + infoLog);
+        } else {
+            return shader;
+        }
+    }
+
+    function createGlslProgram(gl, vertexShaderId, fragmentShaderId) {
+        var program = gl.createProgram();
+        gl.attachShader(program, createShader(gl, vertexShaderId));
+        gl.attachShader(program, createShader(gl, fragmentShaderId));
+        gl.linkProgram(program);
+        gl.validateProgram(program);
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+            var infoLog = gl.getProgramInfoLog(program);
+            gl.deleteProgram(program);
+            throw new Error("An error occurred linking the program: " + infoLog);
+        } else {
+            return program;
+        }
+    }
+
+    var gl = initializeWebGL("webglCanvas");
+    var program = createGlslProgram(gl, "vertexShader", "fragmentShader");
+
+    var vertexData = [
+        -0.5, -0.5, 0.0,  // First vertex
+         1.0,  0.0, 0.0,  // is red.
+         0.5, -0.5, 0.0,  // Second vertex
+         0.0,  1.0, 0.0,  // is green.
+         0.5,  0.5, 0.0,  // Third vertex
+         0.0,  0.0, 1.0,  // is blue.
+        -0.5,  0.5, 0.0,  // Fourth vertex
+         1.0,  1.0, 1.0   // is white.
+    ];
+    var vertexArray = new Float32Array(vertexData);
+    var vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertexArray, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+    var indexData = [0, 1, 2, 0, 2, 3];
+    var indexArray = new Uint16Array(indexData);
+    var indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexArray, gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+    function updateWebGL() {
+        gl.clearColor(0.0, 0.0, 0.0, 0.0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.useProgram(program);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        var vertPositionLocation = gl.getAttribLocation(program, "vert_position");
+        gl.enableVertexAttribArray(vertPositionLocation);
+        gl.vertexAttribPointer(vertPositionLocation, 3, gl.FLOAT, false, 4*6, 0);
+        var vertColorLocation = gl.getAttribLocation(program, "vert_color");
+        gl.enableVertexAttribArray(vertColorLocation);
+        gl.vertexAttribPointer(vertColorLocation, 3, gl.FLOAT, false, 4*6, 4*3);
+        gl.bindBuffer(gl.ARRAY_BUFFER, null);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+
+        gl.useProgram(null);
+
+        window.requestAnimationFrame(updateWebGL);
+    }
+
+    window.requestAnimationFrame(updateWebGL);
+
+</script>
+
+</body>
+</html>

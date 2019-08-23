@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>CS 4621: Lecture 5</title>
+
+    <!-- Bootstrap -->
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="container">
+    <h1>CS 4621: Lecture 5</h1>
+
+    <section>
+        <h2>Textures (Part 2)</h2>
+
+        <ul>
+            <li>Textures are a way to pass image data from Javascript to WebGL.</li>
+            <li>GLSL shaders (almost always the fragment shader) have access to this image data through samplers.</li>
+            <li>This can return the color of a pixel, or blended colors from several pixels.</li>
+        </ul>
+
+        <h2>Exhibits</h2>
+
+        <ul>
+            <li><a href="exhibit00.html">#0: Using an Image Texture</a></li>
+        </ul>
+
+        <h2>Interlude: Image sampling and mipmaps</h2>
+
+        <ul>
+            <li>
+                Textures contain discrete pixels (called texels), but they are referenced using continuous uv coordinates. What if a UV-coordinate doesn't fall right on a texel?
+                <ul>
+                    <li>
+                        Simplest solution: just return the nearest texel.
+                        <ul>
+                            <li>This is easy to implement, and works fine in some cases, but can cause aliasing problems in others.
+                                <br/>
+                                <img src="point-sampling.png">
+                            </li>
+                        </ul>
+                    </li>
+                    <li>Another idea: linearly interpolate between the nearest texels.
+                        <ul>
+                            <li>We need to do this for both the <tt>u</tt> and <tt>v</tt> coordinates, so take a weighted average of up to 4 pixels.</li>
+                            <li>This is called bilinear interpolation.</li>
+                            <li>This looks a little better, but the aliasing problems don't go away.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li>What is going on here?
+                <br/>
+                <img src="pixel-footprint-1.png">
+                <ul>
+                    <li>One pixel in the image plane may map to many texels. Each texel in the pixel's footprint should contribute to the final color.</li>
+                    <li>Also, some pixels may map to a space smaller than a texel (this doesn't contribute to aliasing problems, though).</li>
+                    <li>We need to account for the first case (minification) and the second case (magnification) when using textures in WebGL.</li>
+                </ul>
+                <br/>
+                <img src="pixel-footprint.png" width="500px">
+            </li>
+            <li>
+                Mipmaps are a cheap way to reduce aliasing artifacts when displaying minified textures.
+                <ul>
+                    <li>MIP stands for "Multum in Parvo" meaning "much in little" or "many in small places."</li>
+                    <li>
+                        Basic idea: keep several copies of the image, each resampled to different sizes.
+                        <br/>
+                        <img src="mipmap-layers.png">
+                        <br/>
+                        <small>[Akenine-Moller and Haines 2002]</small>
+                    </li>
+                    <li>When we need to sample a color from the texture, we can estimate the size of that pixel's footprint on the texture.</li>
+                    <li>Then, we can use that information to decide which level of the mipmap to sample.</li>
+                    <li>
+                        We can even linearly sample between nearby levels.
+                        <ul>
+                            <li>If used together with bilinear interpolation on adjacent layers, this is called trilinear interpolation.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        This method effectively blurs out the aliasing artifacts.
+                        <br/>
+                        <img src="mipmap-sampling.png">
+                    </li>
+                    <li>
+                        Notice that this increases the memory footprint of an image by 1/3.
+                        <br/>
+                        <img src="dragon.png">
+                        <img src="dragon-mipmap.png">
+                        <br/>
+                        <small>[Kavita Bala]</small>
+                    </li>
+                    <li>Since this is a commonly used tool, WebGL does most of this for you.</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2>Exhibits, Continued</h2>
+        <ul>
+            <li><a href="exhibit01.html">#1: Texture Parameters</a></li>
+            <li><a href="exhibit02.html">#2: Minification Parameters and Textured 3D Mesh</a></li>
+            <li><a href="exhibit03.html">#3: Loading and Using Multiple Texture</a></li>
+            <li><a href="exhibit04.html">#4: Textures and Transparency</a></li>
+        </ul>
+    </section>
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="../js/jquery-3.1.1.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="../js/bootstrap.min.js"></script>
+<!-- Google Code Prettifier -->
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+</body>
+</html>
