@@ -1,0 +1,6 @@
+# If your local username is not your netid, you can put the following lines in ~/.ssh/config:
+# Host *.cornell.edu
+#   User <netid>
+# Then if you store an SSH public key on cslinux you can run this command without typing a password.
+
+ssh cslinux.cs.cornell.edu bash -c '"cd /courses/cs4620/2019fa/; git pull && chmod -R --quiet g+w ."'
