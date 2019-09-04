@@ -49,7 +49,7 @@ In this example source pixels [3,2] and [4,2] would also contribute with weight 
 Round your results to the nearest ten-thousandth.  Note that the provided output values above provide a check on your work.
 
 <p>
-<img style="width: 350px" src="assignments/thumbnail_warmup-grids.png" alt>
+<img style="width: 350px" alt="" src="thumbnail_warmup-grids.png">
 
 <h4>Assignment</h4>
 
@@ -91,6 +91,7 @@ Some of the functionality you fill find in <tt>ResampleApp</tt>:
 			<li><tt>C</tt>: Catmull-Rom</li>
 			<li><tt>M</tt>: Mitchell-Netravali</li>
 			<li><tt>L</tt>: Linear</li>
+			<li><tt>F</tt>: Linear </li>
 			<li><tt>N</tt>: Nearest neighbor</li>
 		</ul>
 </ul>
@@ -101,7 +102,7 @@ Some of the functionality you fill find in <tt>ResampleApp</tt>:
 <a href="">Here</a> is a video of how our solution behaves.
 
 <p>
-To help you determine whether your implementation is exactly correct, the framework supports setting the view to a fixed rectangle by pressing the <tt>T</tt> key.  For testing you can change this rectangle by editing the code in <tt>ResampleApp.keyEvent</tt>, but don't lose track of the original rectangle; once your code is working you can test it precisely by setting this view, writing an image to disk with the <tt>W</tt> key, and then comparing the result with the following images:
+To help you determine whether your implementation is exactly correct, the framework supports setting the view to a fixed rectangle by pressing the <tt>R</tt> key.  For testing you can change this rectangle by editing the code in <tt>ResampleApp.keyEvent</tt>, but don't lose track of the original rectangle; once your code is working you can test it precisely by setting this view, writing an image to disk with the <tt>W</tt> key, and then comparing the result with the following images:
 <img src="">
 <img src="">
 <img src="">
