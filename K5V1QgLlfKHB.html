@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>CS4620: Introduction to Computer Graphics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le styles -->
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <link href="css/cs4620.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+
+  <body data-spy="scroll" data-target="#navbar">
+
+    <div class="container" id="main">
+
+      <p> This is a test file to let the course staff preview assignments with formatting. </p>
+
+
+      <div id="projects_content"></div>
+
+    </div>
+
+
+    <!-- Le javascript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript">
+    window.onload = function () {
+      $('#schedule_content').load('schedule.html');
+      projects = [
+        { tag: 'filters', name: 'Filters', text: '', src: 'assignments/filters.html' },
+        { tag: 'mesh', name: 'Mesh', text: 'Not yet released.', src: '' },
+        { tag: 'ray', name: 'Ray', text: 'Not yet released.', src: '' },
+        { tag: 'manip', name: 'Manipulators', text: 'Not yet released.', src: '' },
+        { tag: 'shaders', name: 'Shaders', text: 'Not yet released.', src: '' },
+        { tag: 'splines', name: 'Splines', text: 'Not yet released.', src: '' },
+        { tag: 'animation', name: 'Animation', text: 'Not yet released.', src: '' },
+      ]
+      projects.map(function (proj) {
+        $('#projects_content').append($(' \
+          <div class="homework accordion-group" id="' + proj.tag + '"> \
+            <div class="accordion-heading"> \
+              <a class="accordion-toggle" data-toggle="collapse" data-parent="#' + proj.tag + '" href="#' + proj.tag + '-collapse"> \
+                <h3>' + proj.name + '</a></h3> \
+              </a> \
+            </div> \
+            <div class="accordion-body collapse.show" id="' + proj.tag + '-collapse"> \
+              <div id="' + proj.tag + '_content" class="accordion-inner">  \
+              </div> \
+            </div> \
+          </div> \
+        '));
+        if (proj.src) {
+          $('#' + proj.tag + '_content').load(proj.src, function () {
+            MathJax.Hub.Queue(["Typeset", MathJax.Hub, proj.tag + '_content']);
+          });
+        } else {
+          $('#' + proj.tag + '_content').append(proj.text)
+        }
+      });
+    };
+    </script>
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script type="text/javascript" async="true"
+	    src="http://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+
+  </body>
+</html>
