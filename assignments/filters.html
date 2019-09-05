@@ -46,10 +46,10 @@ dst[2,3] = 0.25 * src[3,3] * 0.25 * src[4,3] = 0.5
 In this example source pixels [3,2] and [4,2] would also contribute with weight 0.25, but their values are zero so they are omitted.
 
 <p>
-Round your results to the nearest ten-thousandth.  Note that the provided output values above provide a check on your work.
+Round your results to the nearest ten-thousandth.  Note that the output values above provide a check on your weights.  Also, the following illustration is to scale and can help you sanity-check your numbers.
 
 <p>
-<img style="width: 350px" alt="" src="thumbnail_warmup-grids.png">
+<img style="width: 350px" alt="" src="assignments/thumbnail_warmup-grids.png">
 
 <h4>Assignment</h4>
 
@@ -71,7 +71,7 @@ There are several implementations of this interface, but the only one that is co
 These resampling algorithms are all discussed in greater detail in the lecture slides and in Chapter 9 of the textbook.
 
 <p>
-The <tt>SimpleImage</tt> class is just what it says: a dead-simple image class that has just a width, a height, and an array of bytes that holds the pixel values.  Images always have three channels, and the pixels are organized from left to right and bottom to top.  For instance, a small image with width 3 and height 2 would have <tt>data.length == 18</tt>; the red, green, and blue components of the lower-left pixel at <tt>data[0]</tt>, <tt>data[1]</tt>, and <tt>data[2]</tt>; the upper-left pixel in <tt>data[9]</tt> ... <tt>data[11]</tt>; and the last pixel is the upper-right pixel at <tt>data[15]</tt> ... <tt>data[17]</tt>.  In order to access the pixel data you will need to compute indices into this array; you can compute them directly in your resampling code, but things may turn out more readable if you make use of the provided method stubs for <tt>SimpleImage.getPixel</tt> and <tt>SimpleImage.setPixel</tt>.  Please notice that pixel value <tt>data[i]</tt> is BYTE type.
+The <tt>SimpleImage</tt> class is just what it says: a dead-simple image class that has just a width, a height, and an array of bytes that holds the pixel values.  Images always have three channels, and the pixels are organized from left to right and bottom to top.  For instance, a small image with width 3 and height 2 would have <tt>data.length == 18</tt>; the red, green, and blue components of the lower-left pixel at <tt>data[0]</tt>, <tt>data[1]</tt>, and <tt>data[2]</tt>; the upper-left pixel in <tt>data[9]</tt> ... <tt>data[11]</tt>; and the last pixel is the upper-right pixel at <tt>data[15]</tt> ... <tt>data[17]</tt>.  In order to access the pixel data you will need to compute indices into this array; you can compute them directly in your resampling code, but things may turn out more readable if you make use of the provided method stubs for <tt>SimpleImage.getPixel</tt> and <tt>SimpleImage.setPixel</tt>.  Please notice that pixel value <tt>data[i]</tt> has the Java type <tt>byte</tt>, which is awkward because the pixel value is unsigned but Java always treats integer types as signed, so if you don't do anything special, pixel values above 127 will be interpreted as negative numbers.  The way to deal with this is with an expression like <tt>data[i] &amp; 0xff</tt>, which has the effect of transferring the 8 bits of the <tt>byte</tt> into an <tt>int</tt>, where they represent the correct value in the range [0, 255].  In converting your result back to <tt>byte</tt>, a simple cast will do the job, but you need to watch out for values that might be negative or greater than 255; you should clamp these to 0 and 255.
 
 
 <h4>Framework</h4>
