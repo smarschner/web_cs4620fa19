@@ -54,7 +54,11 @@ Round your results to the nearest ten-thousandth.  Note that the output values a
 <h4>Assignment</h4>
 
 <p>
-The assignment framework displays an image in a resizable window, and it uses an interface <tt>ResampleEngine</tt> to compute the image that is displayed in the window.  The single method in the interface has the signature:
+The assignment framework displays an image in a resizable window, and uses an interface <tt>ResampleEngine</tt> to compute the image that is displayed in the window.
+<a href="https://github.com/smarschner/frameworks_cs4620fa19">Here</a> is the link of filters assignment framework on GitHub.  If you use <a href="https://www.eclipse.org/downloads/">Eclipse</a> to implement, you can select "import projects" and then click "Projects from Folder or Archive".  Click "Directory" and choose folder "filters" to import as Eclipse project.  Right click and select "Configure Build Path" to configure Libraries.  For MacOS platform, you needs to create a run configuration with the needed "-XstartOnFirstThread" VM argument.
+
+<p>
+The single method in the interface has the signature:
 <pre>void resample(SimpleImage src, SimpleImage dst, double left, double bottom, double right, double top);</pre>
 This method computes the destination image <tt>dst</tt> using image content that comes from a rectangle in the source image <tt>src</tt>, maintaining the existing size of the destination image.  The source rectangle extends from <tt>left</tt> to <tt>right</tt> and <tt>bottom</tt> to <tt>top</tt> and is measured in units of input pixels.  For instance, setting the source and destination sizes both to width \(n\) and height \(m\) and the rectangle to \((-0.5, n - 0.5, -0.5, m - 0.5)\) produces an unshifted, unscaled (though possibly slightly blurred, depending on the resampling algorithm) copy of the source image.
 
