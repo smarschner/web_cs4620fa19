@@ -68,7 +68,7 @@ There are several implementations of this interface, but the only one that is co
 </ol>
 
 <p>
-These resampling algorithms are all discussed in greater detail in the lecture slides and in Chapter 9 of the textbook.
+These resampling algorithms are all discussed in greater detail in the lecture slides and in Chapter 9 of the textbook.  At the boundaries of the image, clamp the row and column indices of any pixel accesses that fall outside the image to the edges of the image so that the color of the last pixel extends past the edge.  The result looks like <a href="assignments/clamp_example.png">this</a> when the source rectangle extends outside the bounds of the source image.
 
 <p>
 The <tt>SimpleImage</tt> class is just what it says: a dead-simple image class that has just a width, a height, and an array of bytes that holds the pixel values.  Images always have three channels, and the pixels are organized from left to right and bottom to top.  For instance, a small image with width 3 and height 2 would have <tt>data.length == 18</tt>; the red, green, and blue components of the lower-left pixel at <tt>data[0]</tt>, <tt>data[1]</tt>, and <tt>data[2]</tt>; the upper-left pixel in <tt>data[9]</tt> ... <tt>data[11]</tt>; and the last pixel is the upper-right pixel at <tt>data[15]</tt> ... <tt>data[17]</tt>.  In order to access the pixel data you will need to compute indices into this array; you can compute them directly in your resampling code, but things may turn out more readable if you make use of the provided method stubs for <tt>SimpleImage.getPixel</tt> and <tt>SimpleImage.setPixel</tt>.  Please notice that pixel value <tt>data[i]</tt> has the Java type <tt>byte</tt>, which is awkward because the pixel value is unsigned but Java always treats integer types as signed, so if you don't do anything special, pixel values above 127 will be interpreted as negative numbers.  The way to deal with this is with an expression like <tt>data[i] &amp; 0xff</tt>, which has the effect of transferring the 8 bits of the <tt>byte</tt> into an <tt>int</tt>, where they represent the correct value in the range [0, 255].  In converting your result back to <tt>byte</tt>, a simple cast will do the job, but you need to watch out for values that might be negative or greater than 255; you should clamp these to 0 and 255.
@@ -83,15 +83,15 @@ You can complete this assignment keeping completely within the abstraction bound
 Some of the functionality you fill find in <tt>ResampleApp</tt>:
 <ul>
 	<li>It reads some images from disk with hard-coded filenames.  These are easy to change if you'd like to load other images.</li>
-	<li>It provides a simple pan-and-zoom UI that controls the source rectangle.</li>
+	<li>It provides a simple pan-and-zoom UI that controls the source rectangle; the destination image size is controlled by resizing the window.</li>
 	<li>Each frame, it calls the resampler with the source image and a destination image that matches the current window dimensions, and writes the destination image to an OpenGL texture of that same size.  Then it draws that texture pixel-for-pixel into the window.
 	<li>It provides keyboard controls to change which resampler class is in use:
 		<ul>
 			<li><tt>B</tt>: B-spline</li>
 			<li><tt>C</tt>: Catmull-Rom</li>
 			<li><tt>M</tt>: Mitchell-Netravali</li>
-			<li><tt>L</tt>: Linear with direct implement</li>
-			<li><tt>F</tt>: Linear </li>
+			<li><tt>L</tt>: Linear with direct implementation (using <tt>LinearResampler</tt>)</li>
+			<li><tt>F</tt>: Linear with filter interpolation (using <tt>FilterResampler</tt> with  <tt>LinearFilter</tt>)</li>
 			<li><tt>N</tt>: Nearest neighbor</li>
 		</ul>
 </ul>
@@ -104,8 +104,8 @@ Some of the functionality you fill find in <tt>ResampleApp</tt>:
 <p>
 <!-- To help you determine whether your implementation is exactly correct, the framework supports setting the view to a fixed rectangle by pressing the <tt>T</tt> key.  For testing you can change this rectangle by editing the code in <tt>ResampleApp.keyEvent</tt>, but don't lose track of the original rectangle; once your code is working you can test it precisely by setting this view, writing an image to disk with the <tt>W</tt> key, and then comparing the result with the following images:
  -->
- You can resize window with the <tt>R</tt> key, save an image with the <tt>W</tt> key, and close window with the <tt>Esc</tt> key.
- To help you determine whether your implementation is exactly correct, the framework supports setting the view to a fixed rectangle and writing an image to disk by pressing the <tt>T</tt> key. An image is saved with current filter type in name, and you can compare the result with the following images, which can also be found at <tt>data/cactus_reference_images</tt>.
+ You can resize the window to exactly match the image with the <tt>R</tt> key, save an image with the <tt>W</tt> key, and close window with the <tt>Esc</tt> key.
+ To help you determine whether your implementation is exactly correct, the framework supports setting the view to a fixed rectangle and writing an image to disk by pressing the <tt>T</tt> (<strong>T</strong>est) key. An image is saved with current filter type in name, and you can compare the result with the following images, which can also be found at <tt>data/cactus_reference_images</tt>.
 <div class="row">
   <div class="column">
     <figure>
@@ -130,7 +130,7 @@ Some of the functionality you fill find in <tt>ResampleApp</tt>:
   <div class="column">
     <figure>
       <img src="assignments/img/cactus_LinearSampler.png" alt="LinearSampler" style="width:100%"/>
-      <figcaption class="caption">Linear with Direct Implement</figcaption>
+      <figcaption class="caption">Linear with Direct Implementation</figcaption>
     </figure>
   </div>
   <div class="column">
