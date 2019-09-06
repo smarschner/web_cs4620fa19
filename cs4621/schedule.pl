@@ -291,7 +291,7 @@ while ($month < $cfg{'end_month'} || $day < $cfg{'end_day'}) {
 	    my @notefiles = split /&/, $note;
 	    foreach my $notefile (@notefiles) {
 		$notefile =~ s/#/$leci_pad/;
-		$topic  = "$topic <a href=\"$notefile\">slides</a>",$cr;
+		$topic  = "$topic <a href=\"$notefile\">notes</a>",$cr;
 	    }
 	}
 	print "  <td>$topic</td>$cr";
