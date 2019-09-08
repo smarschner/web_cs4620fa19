@@ -25,10 +25,10 @@ This assignment is primarily about implementing the most commonly used methods f
 As a warmup for this assignment, do the following problem and put the answer into a comment at the top of <tt>FilterResampler.java</tt>.
 
 <p>
-In this warm-up exercise, you'll compute the weights used to average pixels in an image interpolation operation, using the same parameters as used by the resample method in the programming part.
+In this warm-up exercise, you'll compute the weights corresponding to pixels in an image interpolation operation, using the same parameters as used by the resample method in the programming part.
 
 <p>
-Suppose we have a grayscale source image that is 8x8 pixels in size and has a 2x2 white (pixel value 1.0) square in the center (covering pixels (3,3) to (4,4)), on a black (pixel value 0) background.  We resample it to a destination image of size 5x5 using the source rectangle (left, bottom, right, top) = (2.4, 3.2, 4.8, 5.6).  Depending on the interpolation filter we use for this operation, we see different results in the output image; some examples are:
+Suppose we have a grayscale source image that is 8x8 pixels in size and has a 2x2 white (pixel value 1.0) square in the center (covering pixels (3,3) to (4,4)), on a black (pixel value 0) background.  The position of the bottom-left source sample point in the source image, src[0,0], is defined as (0,0).  We resample the source image to a destination image of size 5x5 using the source rectangle (left, bottom, right, top) = (2.4, 3.2, 4.8, 5.6).  The position of bottom-left vertex of the source rectangle, as well as the destination image, is at (2.4, 3.2) in source image coordinate, but the bottom-left destination sample point, dst[0,0], doesn't locate at (2.4, 3.2).  Depending on the interpolation filter we used for this operation, we see different results in the output image; some examples are:
 <ol>
 <li>Nearest neighbor: dst[1,1] = 1.0; dst [1,3] = 0</li>
 <li>Linear interpolation: dst[0,3] = 0.0768; dst[1,1] = 1.0; dst[1,2] = 0.6</li>
@@ -36,10 +36,10 @@ Suppose we have a grayscale source image that is 8x8 pixels in size and has a 2x
 </ol>
 
 <p>
-In each of these cases, what are the input pixels that contributed to the output pixel, and what are their weights?  You can entirely omit pixels that make zero contribution to the result (and their weights).  It's helpful to first figure out pixel postion of destination image.  Please write the result in the following format.  Suppose output pixel [2,3] landed at (3.5, 2.5) in the source image and you are using linear interpolation (this is <em>not</em> where pixel [2,3] actually falls!).  Then dst[2,3] would have the value 0.5 and you would write:
+Reconstruction and up/downsample are two steps of resample.  In each of these cases, what are the input pixels that contributed to the output pixel, and what are their weights?  You can entirely omit pixels that make zero contribution to the result (and their weights).  It's helpful to first figure out pixel postion of destination image.  Please write the result in the following format.  Suppose output pixel [2,3] landed at (3.5, 2.5) in the source image and you are using linear interpolation (this is <em>not</em> where pixel [2,3] actually falls!).  Then dst[2,3] would have the value 0.5 and you would write:
 
 <pre>
-dst[2,3] = 0.25 * src[3,3] * 0.25 * src[4,3] = 0.5
+dst[2,3] = 0.25 * src[3,3] + 0.25 * src[4,3] = 0.5
 </pre>
 
 <p>
