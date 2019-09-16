@@ -49,7 +49,7 @@ In this example source pixels [3,2] and [4,2] would also contribute with weight 
 Round your results to the nearest ten-thousandth.  Note that the output values above provide a check on your weights.  Also, the following illustration is to scale and can help you sanity-check your numbers.
 
 <p>
-<img style="height: 290px" alt="" src="assignments/warmup-grids_v2.jpg">
+<img style="height: 290px" alt="" src="assignments/a1_filters/warmup-grids_v2.jpg">
 
 <h4>Assignment</h4>
 
@@ -72,9 +72,9 @@ There are several implementations of this interface, but the only one that is co
 </ol>
 
 <p>
-These resampling algorithms are all discussed in greater detail in the lecture slides and in Chapter 9 of the textbook.  At the boundaries of the image, clamp the row and column indices of any pixel accesses that fall outside the image to the edges of the image so that the color of the last pixel extends past the edge.  The result looks like <a href="assignments/clamp_example.png">this</a> when the source rectangle extends outside the bounds of the source image.
+These resampling algorithms are all discussed in greater detail in the lecture slides and in Chapter 9 of the textbook.  At the boundaries of the image, clamp the row and column indices of any pixel accesses that fall outside the image to the edges of the image so that the color of the last pixel extends past the edge.  The result looks like <a href="assignments/a1_filters/clamp_example.png">this</a> when the source rectangle extends outside the bounds of the source image.
 <p>
-<img style="height: 100px" alt="" src="assignments/clamp_example.png">
+<img style="height: 100px" alt="" src="assignments/a1_filters/clamp_example.png">
 
 
 <p>
@@ -126,19 +126,19 @@ Please hand in on CMS, with a Zip file of the "filters" directory.  Please add a
 <div class="row">
   <div class="column">
     <figure>
-      <img src="assignments/img/cactus_B-spline.png" alt="B-spline" style="width:100%"/>
+      <img src="assignments/a1_filters/img/cactus_B-spline.png" alt="B-spline" style="width:100%"/>
       <figcaption class="caption">B-spline</figcaption>
     </figure>
   </div>
   <div class="column">
     <figure>
-      <img src="assignments/img/cactus_Catmull-Rom.png" alt="Catmull-Rom" style="width:100%"/>
+      <img src="assignments/a1_filters/img/cactus_Catmull-Rom.png" alt="Catmull-Rom" style="width:100%"/>
       <figcaption class="caption">Catmull-Rom</figcaption>
     </figure>
   </div>
   <div class="column">
     <figure>
-      <img src="assignments/img/cactus_Mitchell-Netravali.png" alt="Mitchell-Netravali" style="width:100%"/>
+      <img src="assignments/a1_filters/img/cactus_Mitchell-Netravali.png" alt="Mitchell-Netravali" style="width:100%"/>
       <figcaption class="caption">Mitchell-Netravali</figcaption>
     </figure>
   </div>
@@ -146,19 +146,19 @@ Please hand in on CMS, with a Zip file of the "filters" directory.  Please add a
 <div class="row">
   <div class="column">
     <figure>
-      <img src="assignments/img/cactus_LinearSampler.png" alt="LinearSampler" style="width:100%"/>
+      <img src="assignments/a1_filters/img/cactus_LinearSampler.png" alt="LinearSampler" style="width:100%"/>
       <figcaption class="caption">Linear with Direct Implementation</figcaption>
     </figure>
   </div>
   <div class="column">
     <figure>
-      <img src="assignments/img/cactus_LinearFilter.png" alt="LinearFilter" style="width:100%"/>
+      <img src="assignments/a1_filters/img/cactus_LinearFilter.png" alt="LinearFilter" style="width:100%"/>
       <figcaption class="caption">Linear with Filter Interpolation</figcaption>
     </figure>
   </div>
   <div class="column">
     <figure>
-      <img src="assignments/img/cactus_NearestNeighborSp.png" alt="NearestNeighbor" style="width:100%"/>
+      <img src="assignments/a1_filters/img/cactus_NearestNeighborSp.png" alt="NearestNeighbor" style="width:100%"/>
       <figcaption class="caption">Nearest Neighbor</figcaption>
     </figure>
   </div>
