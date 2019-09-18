@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>OBJ Viewer</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #707080;
+				margin: 0px;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+	<body>
+	<div id="container">
+		<div id="controlBar" style="text-align: center;">
+			<input type="file" id="meshInputFile" style="display: none;" onchange="loadFile(this.files[0])">
+			<input type="button" id="meshInputButton" value="Select OBJ File" onclick="document.getElementById('meshInputFile').click()">
+			<input type="file" id="texInputFile" style="display: none;" onchange="loadTexture(this.files[0])">
+			<input type="button" id="texInputButton" value="Select Texture File" onclick="document.getElementById('texInputFile').click()">
+			<label><input type="checkbox" id="showAxesCheckbox" onchange="toggleAxes(this.checked)" checked="true">Show Axes</label>
+			<label><input type="checkbox" id="showWireframeCheckbox" onchange="toggleWireframe(this.checked)" checked="true">Show Wireframe</label>
+			<label><input type="checkbox" id="showNormalsCheckbox" onchange="toggleNormals(this.checked)" checked="true">Show Normals</label>
+			<input type="range" id="normalLengthRange" min="0.02" max="0.5" step="0.02" value="0.3" oninput="setNormalLength(this.value)">
+			<br>
+			Left click + drag to orbit. Right click + drag to pan. Scroll to zoom.
+		</div>
+	</div>
+
+		<script src="js/three.min.js"></script>
+		<script src="js/Detector.js"></script>
+		<script src="js/OrbitControls.js"></script>
+		<script src="js/OBJLoader.js"></script>
+
+		<script>
+			if (!Detector.webgl) {
+				Detector.addGetWebGLMessage();
+			}
+
+			var camera, controls, scene, renderer;
+			var normalLines = null, group = null, backGroup = null, wireframeGroup = null;
+			var meshMaterial, backMaterial, wireframeMaterial, normalLineMaterial;
+			var lightGroup;
+			var normalLength;
+			var axesGroup;
+
+			init();
+			animate();
+
+			function addOBJGroup(OBJgroup) {
+				if (group != null) {
+					scene.remove(group);
+				}
+				if (normalLines != null) {
+					scene.remove(normalLines);
+				}
+				if (backGroup != null) {
+					scene.remove(backGroup);
+				}
+				if (wireframeGroup != null) {
+					scene.remove(wireframeGroup);
+				}
+				if (OBJgroup == null) {
+					console.log("mesh is null");
+					return;
+				}
+
+				group = OBJgroup;
+				backGroup = OBJgroup.clone(true);
+				wireframeGroup = OBJgroup.clone(true);
+				scene.add(group);
+				scene.add(backGroup);
+				scene.add(wireframeGroup);
+
+				normalLines = new THREE.Group();
+				group.children.map(function(object) {
+					object.material = meshMaterial;
+					normalLines.add(make_normals(object, normalLength));
+				});
+				scene.add(normalLines);
+
+				backGroup.children.map(function(object) {
+					object.material = backMaterial;
+				});
+
+				wireframeGroup.children.map(function(object) {
+					object.material = wireframeMaterial;
+				});
+
+			}
+
+			function init() {
+				var container = document.getElementById('container');
+
+				camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 50);
+				camera.position.z = 5;
+
+				scene = new THREE.Scene();
+
+				lightGroup = new THREE.Group();
+				var light1 = new THREE.PointLight(0xffffff, 0.8);
+				light1.position.set(50, 50, 100);
+				lightGroup.add(light1);
+				var light2 = new THREE.PointLight(0xeeeeff, 0.6);
+				light2.position.set(-50, -50, -50);
+				lightGroup.add(light2);
+
+				renderer = new THREE.WebGLRenderer({ antialias: true }); // WebGLRenderer CanvasRenderer
+				renderer.setClearColor(0x707080);
+				renderer.setPixelRatio(window.devicePixelRatio);
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				container.appendChild(renderer.domElement);
+
+				controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+				meshMaterial = new THREE.MeshLambertMaterial();
+				meshMaterial.side = THREE.FrontSide;
+				backMaterial = new THREE.MeshBasicMaterial({ color: 0xaaa000 });
+				backMaterial.side = THREE.BackSide;
+				wireframeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true });
+				normalLineMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff, transparent: true });
+
+				axesGroup = new THREE.AxisHelper(1.5);
+
+				// Account for cached state in some browsers
+				document.getElementById('showAxesCheckbox').onchange();
+				document.getElementById('showWireframeCheckbox').onchange();
+				document.getElementById('showNormalsCheckbox').onchange();
+				document.getElementById('normalLengthRange').oninput();
+
+				window.addEventListener('drop', function(e) {
+					e = e || event;
+					e.preventDefault();
+					e.stopPropagation();
+					var file = e.dataTransfer.files[0];
+					var fileType = file.name.split(".").pop();
+					if (fileType === 'obj') {
+						loadFile(file);
+					}  else if (file.type.match(/image.*/)) {
+						loadTexture(file);
+					} else {
+						console.log("Unknown file type: " + file.name);
+					}
+				}, false);
+
+				window.addEventListener('dragover', function(e) {
+					e = e || event;
+					e.preventDefault();
+				}, false);
+
+				window.addEventListener('resize', onWindowResize, false);
+			}
+
+			function make_normals(object, scale) {
+				// Create a Line geometry that will draw the normals for the given object.
+				// For now assumes the object is a non-indexed mesh.
+				var geom = object.geometry;
+				var posns = geom.getAttribute('position');
+				var norms = geom.getAttribute('normal');
+				if (norms) {
+					var n = norms.count;
+
+					linePosns = [];
+
+					if (n != posns.count) {
+						console.error("Help! normals and positions different length!");
+					}
+					for (let i = 0; i < norms.count; i++) {
+						linePosns.push(posns.getX(i), posns.getY(i), posns.getZ(i));
+						linePosns.push(
+							posns.getX(i) + scale * norms.getX(i), 
+							posns.getY(i) + scale * norms.getY(i), 
+							posns.getZ(i) + scale * norms.getZ(i)
+							);
+					}
+
+					var buffergeometry = new THREE.BufferGeometry();
+					buffergeometry.addAttribute('position', new THREE.BufferAttribute(new Float32Array(linePosns), 3));
+					var material = normalLineMaterial;
+					return new THREE.LineSegments(buffergeometry, material);
+				}
+			}
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize(window.innerWidth, window.innerHeight);
+			}
+
+			function animate() {
+				requestAnimationFrame(animate);
+				controls.update();
+				var tempLightGroup = lightGroup.clone(true);
+				scene.add(tempLightGroup);
+				tempLightGroup.applyMatrix(camera.matrix);
+				render();
+				scene.remove(tempLightGroup);
+			}
+
+			function render() {
+				renderer.render(scene, camera);
+			}
+
+			function loadFile(file) {
+				var reader = new FileReader();
+				reader.addEventListener('load', function(event) {
+					var contents = event.target.result;
+					var object = new THREE.OBJLoader().parse(contents);
+					object.name = file.name;
+					addOBJGroup(object);
+				});
+				reader.readAsText(file);
+			}
+
+			function loadTexture(file) {
+				var reader = new FileReader();
+				reader.addEventListener('load', function(event) {
+					var contents = event.target.result;
+					var loader = new THREE.TextureLoader();
+					loader.load(contents, function(texture) {
+						meshMaterial.map = texture;
+						meshMaterial.needsUpdate = true;
+					});
+				});
+				reader.readAsDataURL(file);
+			}
+
+			function toggleAxes(show) {
+				if (show) {
+					scene.add(axesGroup);
+				} else {
+					scene.remove(axesGroup);
+				}
+			}
+
+			function toggleWireframe(show) {
+				if (show) {
+					wireframeMaterial.opacity = 1.0;
+				} else {
+					wireframeMaterial.opacity = 0.0;
+				}
+			}
+
+			function toggleNormals(show) {
+				if (show) {
+					normalLineMaterial.opacity = 1.0;
+				} else {
+					normalLineMaterial.opacity = 0.0;
+				}
+			}
+
+			function setNormalLength(length) {
+				normalLength = length;
+				if (group != null) {
+					if (normalLines != null) {
+						scene.remove(normalLines);
+					}
+					normalLines = new THREE.Group();
+					group.children.map(function(object) {
+						normalLines.add(make_normals(object, normalLength));
+					});
+					scene.add(normalLines);
+				}
+			}
+
+		</script>
+	</body>
+</html>
