@@ -65,7 +65,7 @@ In this assignment, your ray tracer will have support for:
 <!-- 
 
 <p>A new commit has been pushed to the class Github page in the master branch. We recommend
-switching to your master branch, pulling this commit, creating a new branch (e.g. A2
+switching to your master branch, pulling this commit, creating a new branch (e.g. Ray
 solution), and committing your work there. This new commit contains all the framework changes and additions necessary for this project. -->
 
 
@@ -79,16 +79,16 @@ solution), and committing your work there. This new commit contains all the fram
 
 <pre class="dark">git clone https://github.com/smarschner/frameworks_cs4620fa19</pre>
 
-Once you have the basecode downloaded, you can find the functions to be implemented by searching <tt>TODO#A2</tt>.
+Once you have the basecode downloaded, you can find the functions to be implemented by searching <tt>TODO#Ray</tt>.
 To see all these TODO's in Eclipse, select <tt>Search</tt> menu, then <tt>File Search</tt>
-and type <tt>"TODO#A2"</tt>. There are quite a few separate code snippets to
+and type <tt>"TODO#Ray"</tt>. There are quite a few separate code snippets to
 complete in this assignment. To check your progress as you go along, we
 recommend implementation in the following order.
 
 <h4>Getting Started</h4>
 
 <p>
-    The ray1 framework is set up to output high-dynamic range (HDR) images in the OpenEXR format.  We use the <tt>openexr</tt> C++ library to produce HDR output, via a JNI library called <tt>openexrjni</tt>. In order for the Java runtime to find the native library that is appropriate to your platform, you need to configure your native library location. To do this in Eclipse, go to Project → Properties → Java Build Path → Select Libraries → Select the openexrjni-3.0.0.jar dropdown menu → Modify Native Library Location. Modify this setting so that it matches your OS. Also in Project -> Properties -> Java Build Path → Select Source → Select the a2/src. Drop Down Menu → Modify Native Library Location. Modify this setting so that it matches your OS.
+    The ray1 framework is set up to output high-dynamic range (HDR) images in the OpenEXR format.  We use the <tt>openexr</tt> C++ library to produce HDR output, via a JNI library called <tt>openexrjni</tt>. In order for the Java runtime to find the native library that is appropriate to your platform, you need to configure your native library location. To do this in Eclipse, go to Project → Properties → Java Build Path → Select Libraries → Select the openexrjni-3.0.0.jar dropdown menu → Modify Native Library Location. Modify this setting so that it matches your OS. Also in Project → Properties → Java Build Path → Select Source → Select the ray/src. Drop Down Menu → Modify Native Library Location. Modify this setting so that it matches your OS.
   </p>
   <p>
   If you are on Linux, you will additionally need to add <tt>deps/native/linux</tt> to <tt>LD_LIBRARY_PATH</tt>. One way to do so is to launch Eclipse as follows in a terminal, where the actual path to <tt>deps/native/linux</tt> is substituted in for <tt>&lt;path/to/deps/native/linux&gt;</tt>:
@@ -101,7 +101,7 @@ recommend implementation in the following order.
     <ul>
     <li>You can use <a href="https://github.com/Tom94/tev">tev</a> image viewer to view EXR images. 
     <li><a href="https://bitbucket.org/wkjarosz/hdrview">HDRView</a>, a minimal but convenient viewer that is cross-platform but comes precompiled only for MacOS.
-    <li><a href="http://www.irfanview.com/">IrfanView</a>, a mature and full featured image manipulation program that's free for commercial use but is Windows-only.
+    <li><a href="http://www.irfanview.com/">IrfanView</a>, a mature and full featured image manipulation program that's free for non-commercial use but is Windows-only.
     <li>The qt4image app, part of <a href="https://bitbucket.org/edgarv/hdritools">HDRITools</a> package from which our JNI library also comes, which is cross-platform but very minimal.
     <li>The Preview app that comes with MacOS, which is handy (you can adjust exposure in the Adjust Color dialog) but has a habit of overwriting your files without asking.
     <li>Photoshop, the widely used image manipulation program, if you already happen to own a license.
@@ -112,10 +112,10 @@ recommend implementation in the following order.
 
 <h3>Task 1: Generating Rays from Cameras (20 points)</h3>
 
-<p>Here in this task, you are going to generate rays by implementing two instances of the <code>Camera</code> object, including orthographic camera and perspective camera. </p>
-<p>You can find the function to implement in both <code>OrthographicCamera.java</code> and <code>PerspectiveCamera.java</code>.
+<p>Here in this task, you are going to generate rays by implementing two subclasses of the <code>Camera</code> class, including orthographic camera and perspective camera. </p>
+<p>You can find the functions to implement in  <code>OrthographicCamera.java</code> and <code>PerspectiveCamera.java</code>.
 
-<p><tt>OrthographicCamera</tt> and <tt>PerspectiveCamera</tt> are both <tt>Camera</tt> class representing a camera in the scene. For each of these camera you need to
+<p><tt>OrthographicCamera</tt> and <tt>PerspectiveCamera</tt> are both <tt>Camera</tt> subclasses representing a camera in the scene. For each of these cameras you need to
    implement the following methods: 
 
 <p> 1. <code>public void init()</code>. This method performs one-time setup after the scene (including the camera) is read and before rendering begins.  
@@ -132,9 +132,9 @@ All of the properties you will need are stored in the <tt>Camera</tt> class.
 <p>You can then test your getRay() method for both of these classes by running the main method in Camera.java. You should get "Test successful" messages if your implementation is correct.
 
 
-<h3>Task 2: Intersecting Ray with Surfaces (20 points)</h3>
+<h3>Task 2: Intersecting Ray with Surfaces (30 points)</h3>
 
-<p>Here in this task, you are going to implement the function <code>boolean intersect(IntersectionRecord outRecord, Ray rayIn)</code> in both <code>sphere.java</code> and <code>triangle.java</code>. 
+<p>Here in this task, you are going to implement the function <code>boolean intersect(IntersectionRecord outRecord, Ray rayIn)</code> in both <code>Sphere.java</code> and <code>Triangle.java</code>. 
 <p> This method intersects the given ray with the surface. Return true if the ray intersects the geometry 
       and write relevant information to the IntersectionRecord structure. Relevant information 
       includes the position of the hit point <code>.location</code>, the surface normal at the hit point <code>.normal</code>, 
@@ -147,7 +147,7 @@ All of the properties you will need are stored in the <tt>Camera</tt> class.
   boolean intersect(IntersectionRecord outRecord, Ray ray)
 </pre> -->
 
-<p>We ask that you implement the intersection method for the following surfaces:
+<p>We ask that you implement the intersection methods for the following surfaces:
 <ul style="list-style: none;">
   <li><strong><tt>1.Sphere</strong></tt>: The class contains a 3D point <tt>center</tt> and a float <tt>radius</tt>. You will need to solve the sphere/ray intersection equations. Be sure to calculate the exact normal at the point of intersection and store it in the <tt>IntersectionRecord</tt>. Additionally, please compute and store UV-coordinates in the same orientation as Assignment 1 (i.e. the poles should lie on the y-axis, and the seam should intersect the negative z-axis if the sphere is located at the origin). See section 4.4.1 of the book.
   <li><strong><tt>2.Triangle</strong></tt>: In our system, each triangle belongs to a <tt>Mesh</tt>, which keeps a reference to a <tt>mesh</tt> object. A triangle stores an <tt>OBJFace</tt> object which corresponds to the face formed by the triangle. See section 4.4.2 of the book.
@@ -155,10 +155,10 @@ All of the properties you will need are stored in the <tt>Camera</tt> class.
 If the owning face does not have a per-vertex normal, the <tt>intersect</tt>
 method should return the triangle normal stored in <tt>Triangle</tt>. If it does,
 it should interpolate the normals of the three vertices using the barycentric
-coordinate of the hit point. Texture coordinates, if available, should be interpolated using barycentric coordinates as well.
+coordinates of the hit point. Texture coordinates, if available, should be interpolated using barycentric coordinates as well.
 </ul>
 
-<h3>Task 3: Scene (20 points)</h3>
+<h3>Task 3: Scene (10 points)</h3>
 
 <p>The <tt>Scene</tt> class stores information relating to the composition, 
 i.e. the camera, a list of surfaces, a list of lights, etc. It also contains a scene-file-specified <tt>exposure</tt> field, which can be used to adjust the brightness of the resulting image. You need to implement the following method: 
@@ -194,7 +194,8 @@ i.e. the camera, a list of surfaces, a list of lights, etc. It also contains a s
 
 <h3>Task 5: Shading (30 points)</h3>
 
-<p>We ask you to implement the Lambertian and Phong shading models, with mirror reflectance. </p>
+<p> Here in this task, you are computing the value returned from a ray. We ask you to implement the Lambertian and Phong shading models, with mirror reflections. 
+  You can find the method to be filled in <code>PhongBRDF.java</code>, <code>LambertianBRDF.java</code> and <code>ReflectionShader.java</code></p>
 
 <p>A shader is represented by an instance of the abstract <code>Shader</code> class.  
   The key method in the <code>Shader</code> hierarchy is
@@ -212,6 +213,7 @@ the light that comes from the incoming direction \(\omega_i\) (i.e. the directio
   L_o = f_r(\mathbf{x}, \omega_i, \omega_o) 
         \max(\mathbf{n} \cdot \omega_i, 0) \frac{I}{r^2}
   \]
+
 where \(\omega_i\) is a unit vector towards the light, \(\omega_o\) is a unit vector toward the viewer, \(\mathbf{x}\) is a location on the surface, and \(\mathbf{n}\) is the surface normal at \(\mathbf{x}\). \(I\) and \(r^2\) are the intensity and distance of the light source, respectively.  The function \(f_r\) is the BRDF of the surface, and it is different for each material.  The BRDF is represented by the <tt>BRDF</tt> class, with its key method
 <p>
 <code>
@@ -221,7 +223,7 @@ where \(\omega_i\) is a unit vector towards the light, \(\omega_o\) is a unit ve
 </code>
 </p>
 
-<p>We ask you to implement the Lambertian and Phong shading models by implementing the single shading method <code>ReflectionShader.shade</code> and the evaluation methods <code>LambertianBRDF.evalBRDF</code> and <code>PhongBRDF.evalBRDF</code> (with the Microfacet BRDFs as extra credit: implementing them will automatically enable microfacet shading).
+<p>We ask you to implement the Lambertian and Phong shading models by implementing  and the evaluation methods <code>LambertianBRDF.evalBRDF</code> and <code>PhongBRDF.evalBRDF</code> (with the Microfacet BRDFs as extra credit: implementing them will automatically enable microfacet shading).
 
 <ul style="list-style: none;">
   <li><tt><strong>ReflectionShader</tt></strong>: In the <code>shade</code> method you will basically evaluate the expression above for \(L_o\) (which corresponds to the output parameter <tt>outRadiance</tt>), using the provided parameters.</p>
@@ -268,7 +270,13 @@ This way, if you manage to get a view direction that actually points <i>into</i>
 
 </ul>
 
-<h5><strong>Mirror reflection</strong></h5>
+<h5>Textures</h5>
+
+<p>The <tt>BRDF</tt> classes above have a <tt>diffuseReflectance</tt> field that controls the diffuse color, as well as a <tt>diffuseReflectanceTexture</tt> field that is by default set to <tt>null</tt>. If the scene XML file specifies an image texture for the shader, a <tt>Texture</tt> object will be referenced by this field.  In this case, you should use the texture to determine the diffuse color in the <tt>evalBRDF</tt> method, ignoring the <tt>diffuseReflectance</tt> field.</p>
+This logic is encapsulated in the helper method <tt>BRDF.getDiffuseReflectance</tt> which is available to all the BRDF methods you're implementing.
+
+
+<h5>Mirror reflection</h5>
 
 <p>Once you have shading based on illumination from light sources working, 
   there is one more kind of reflection to include: reflections of objects in one another's surfaces.  
@@ -280,20 +288,22 @@ This way, if you manage to get a view direction that actually points <i>into</i>
   to compute the direction that is seen by a ray starting at the surface and proceeding 
   in the direction that is the mirror reflection of the view direction. 
    Compute the reflection direction as discussed in the book (Section 4.8) 
-   and in the slides, find the radiance seen in that direction, scale it by <tt>Fresnel reflectance coefficient</tt> and add it into <tt>outRadiance</tt>. 
-  The Fresnel coefficient is computed 
+   and in the slides, find the radiance seen in that direction, scale it by the mirror reflectance and add it into <tt>outRadiance</tt>. 
+  The mirror reflectance is computed using Schlick's approximation:
   \[
   R(\theta) = R_0 + (1 - R_0)( 1 - \cos \theta)^5
   \]
+
   Where \(\theta\) is the angle between incident light and the surface normal at hit point. \(R_0\) is the <code>mirrorCoefficient</code> we passed in in xml file.
-  </p> 
+  <p>You will need to introduce a limit on recursion depth; use the  <tt>depth</tt> argument as a counter to limit recursion to 12 levels deep. 
+</p> 
+
 
 <p>Mirror reflection is not enabled for most scenes because it slows things down a bit; 
   to keep from wasting time when it is turned off, check whether <code>mirrorCoefficient</code> 
   is nonzero before tracing the recursive ray.  Once mirror reflection is working you will 
   be able to render the <tt>four-spheres</tt> scene and see lots of interreflections, 
   and will see the reflections added to the <tt>teapot</tt> scenes.
-
 
 
 <h3>Testing Your Code</h3>
@@ -303,16 +313,16 @@ fast_scenes are for quick regression testing
 don't be afraid to edit the scenes!  Especially to make low res versions for quicker iteration.-->
 
 <p>The <tt>data</tt> directory contains scene files and reference images for the purpose of testing your code. Right click on the 
-<tt> RayTracer</tt> file in <tt>Package Explorer</tt>, and choose <tt>Run As->Java Application</tt>.  These scene files are organized into several subdirectories:
+<tt> RayTracer</tt> file in <tt>Package Explorer</tt>, and choose <tt>Run As</tt> → <tt>Java Application</tt>.  These scene files are organized into several subdirectories:
 <ul>
   <li><tt>fast_scenes</tt>: a collection of simple scenes that should render very quickly, under a second each, so that you can quickly tell what is working.  You should re-render these constantly as you work, so that you learn right away if you have broken something that used to work.</li>
   <li><tt>mesh_scenes</tt>: scenes that test the ability to handle larger triangle meshes.  Since your ray tracer takes time linear in the number of triangles, these will be slower to render.  When you are iterating on one of these results, don't hesitate to edit the input file to make the output image temporarily much smaller!</li>
-  <li><tt>textured_scenes</tt>: scenes that test the texture mapping features.  These won't render correctly until you have implemented the texture mapping methods.</li>
+  <li><tt>textured_scenes</tt>: scenes that test the texture mapping features.</li>
 </ul>
 Without just a directory name passed as a command line argument, the ray tracer will attempt to render all scenes in the corresponding scene directory (i.e. <tt>data/scenes/ray1/<i>dirname</i></tt>).
 If you want to render specific scenes, you can list the file names individually on the command line. </p>
 
-<p>You can set up command line arguments from the <tt>Run</tt> dialog (<tt>Run Configurations</tt>) in Eclipse. Choose the <tt>Arguments</tt> tab, and provide your command line arguments in <tt>Program arguments</tt>.  Alternatively, you can run the program from the command line, which is sometimes more convenient for rapid iteration.  You will need to set both the class path and the library path; a command line like the following, executed in the <tt>a2/</tt> project directory, will do it:
+<p>You can set up command line arguments from the <tt>Run</tt> dialog (<tt>Run Configurations</tt>) in Eclipse. Choose the <tt>Arguments</tt> tab, and provide your command line arguments in <tt>Program arguments</tt>.  Alternatively, you can run the program from the command line, which is sometimes more convenient for rapid iteration.  You will need to set both the class path and the library path; a command line like the following, executed in the <tt>Ray/</tt> project directory, will do it:
 <pre>java -cp bin/:deps/lib/openexrjni-3.0.0.jar -Djava.library.path=deps/native/macosx/ ray1.RayTracer fast_scenes/</pre>  
 with an appropriate substitution to the library path for Windows or Linux.
 
@@ -325,7 +335,7 @@ with an appropriate substitution to the library path for Windows or Linux.
 significant differences, consider checking for bugs in your code.
 
 <h4>Appendix B: Extra Credit</h4>
-<tt><strong>Cylinder surface</strong></tt>
+<h5>Cylinder surface</h5>
 <ul>
   <p>We've included a <tt>Cylinder</tt> subclass of <tt>Surface</tt>, similar to the <tt>Triangle</tt> and <tt>Sphere</tt> classes. The class contains <tt>center</tt>, a 3D point, and <tt>radius</tt>, <tt>height</tt>, both real numbers. Assume that the cylinder is capped, i.e., the top and bottom have caps (it is not a hollow tube). Also, assume it is aligned with the z-axis, and is centered around <tt>center</tt>; <br>
   i.e., if
@@ -336,9 +346,9 @@ significant differences, consider checking for bugs in your code.
   <p>Once this is done, try implementing a cylinder that is arbitrarily oriented. You will need to add two parameters, <tt>rotX</tt> and <tt>rotY</tt>, to specify the cylinder's rotation about the x and y axes. Note that this will require changing the coordinate system of the incoming ray within the <tt> intersect</tt> method to account for these rotations. After the coordinate system change, the math used to intersect the ray with the cylinder should be the same as its axis-aligned variant. Finally, build a test scene with a cylinder object.
 </ul>
 
-<tt><strong>Microfacet BRDF with Beckmann distribution</strong></tt>
+<h5>Microfacet BRDF</h5>
 <ul>
-<li><tt><strong>MicrofacetBRDF</strong></tt>: This and its two subclasses implement two variants of the Microfacet BRDF model. Its BRDF function is product of several factors:
+<li><strong><tt>MicrofacetBRDF</tt></strong>: This and its two subclasses implement two variants of the Microfacet BRDF model. Its BRDF function is product of several factors:
   <ul style="list-style: none; text-align: center;">
     \[ f_r(\omega_i,\omega_o,n) \; =  \; \frac{F(\omega_i,h)G(\omega_i,\omega_o,h)D(h)}{4|\omega_i \cdot n| |\omega_o \cdot n|} \]
   </ul>
@@ -367,7 +377,7 @@ significant differences, consider checking for bugs in your code.
 
 <p>The \(G\) and \(D\) functions differ for the two variants.</p>
 
-<li><tt><strong>BeckmannBRDF</strong></tt>: this class implements the Beckmann microfacet distribution.
+<li><strong><tt>BeckmannBRDF</tt></strong>: this class implements the Beckmann microfacet distribution.
 
   <p><tt>\(D(h)\)</tt>: This factor comes from the microfacet distribution function. For the Beckmann model it is:
     \[ D(h) \; = \; \frac{\chi^{+}(h \cdot n)}{\pi\alpha_b^2\cos^2\theta_h} \; e^{\frac{-\tan^2\theta_h}{\alpha_b^2}} \]
@@ -386,9 +396,8 @@ significant differences, consider checking for bugs in your code.
      \]
   where \(a=(\alpha_b\tan\theta_v)^{-1}\) and \(\theta_v\) is the angle between \(v\) and \(n\).
 </p>
-</ul>
 
-<li><tt><strong>GGXBRDF</strong></tt>: The microfacet-based shader implemented above assumes the normal distribution of the microfacet surface is Beckmann. Another class of normal distribution that is widely used is GGX. In order to implement microfacet shader with GGX distribution, both the Smith shadowing-masking factor \(G(\omega_i,\omega_o,h)\) and the microfacet distribution factor \(D(h)\) should be modified. </p>
+<li><strong><tt>GGXBRDF</tt></strong>: The microfacet-based shader implemented above assumes the normal distribution of the microfacet surface is Beckmann. Another class of normal distribution that is widely used is GGX. In order to implement microfacet shader with GGX distribution, both the Smith shadowing-masking factor \(G(\omega_i,\omega_o,h)\) and the microfacet distribution factor \(D(h)\) should be modified. </p>
   <p>
   The GGX distribution with width parameter \(\alpha_gs\) is 
     \[ D(h) \; = \; \frac{\alpha_g^2\;\chi^{+}(h \cdot n)}{\pi\cos^4\theta_h\;(\alpha_g^2\;+\;\tan^2\theta_h)^2} \]
@@ -400,6 +409,7 @@ significant differences, consider checking for bugs in your code.
     \; \frac{2}{1\;+\;\sqrt{1\;+\;\alpha_g^2\tan^2\theta_v}}
      \]
   The meaning of the variable notations and all other factors in the BRDF function keep the same as above.</p>
+</ul>
 
 
   <tt><strong>Textures</strong></tt>
@@ -433,12 +443,12 @@ format, and stubs for the classes that are required by the parser.
 method is provided, so that your program will have a command-line
 interface compatible with ours. It treats each command line argument
 as the name of an input file, which it parses, renders an image, and
-writes the image to a PNG file. The method <tt>RayTracer.renderImage</tt> is called to do the actual rendering.
+writes the image to an EXR file. The method <tt>RayTracer.renderImage</tt> is called to do the actual rendering.
 
 <h5><strong>Image</strong></h5>
 
 <p>This class contains an array of pixel colors (stored as doubles) and the requisite
-code to get and set pixels and to output the image to a PNG file.
+code to get and set pixels and to output the image to a file.
 
 <h5><strong><tt>egl.math</tt> package</strong></h5>
 
