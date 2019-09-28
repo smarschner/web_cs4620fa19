@@ -56,7 +56,7 @@ In this assignment, your ray tracer will have support for:
   <!-- <li>Recursive refectance/refractance (Extra credit)</li> -->
 </ul>
 
-<p>Your ray tracer will read files in an XML file format and output images in the OpenEXR high-dynamic-range (HDR) image format. We have split ray tracing in CS4620 into two parts. For now, you will implement basic ray tracing. Later in the semester, after you have learned many more graphics techniques, you will implement other features, such as advanced shading and illumination, faster rendering, and transformations on groups of objects. In this document, we focus on what you need to implement the basic elements of a ray tracer.
+<p>Your ray tracer will read files in an XML file format and output images in the OpenEXR high-dynamic-range (HDR) image format. We have split ray tracing in CS4620 into two parts. For now, you will implement basic ray tracing. Later in the next assignment, after you have learned accelerate structure, you will implement features for faster rendering. In this document, we focus on what you need to implement the basic elements of a ray tracer.
 
 <h5>Precisions in the programming assignment</h5>
 <p>All the input in this project is parsed in single precision and the scene is stored in single precision as well.  This is a good practice since scene data in real systems can occupy a lot of memory. But accurate ray intersections and shadows are difficult to achieve with single precision.  So you should carry out all the geometric calculations, and store all related intermediate results, in double precision.
