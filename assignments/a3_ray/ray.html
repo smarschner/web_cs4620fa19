@@ -22,9 +22,12 @@
 
 <p>Ray tracing is a simple and powerful algorithm for rendering images. Within the accuracy of the scene and shading models and with enough computing time, the images produced by a ray tracer can be physically accurate and can appear indistinguishable from real images. Cornell pioneered research in accurate rendering. See <a href="http://www.graphics.cornell.edu/online/box/compare.html">http://www.graphics.cornell.edu/online/box/compare.html</a> for the famous Cornell box, which exists in Rhodes Hall.
 
-<p>The basic idea behind ray tracing is to model the movement of photons as they travel along their path from a light source, to a surface, and finally to a viewer's eye. Tracing forward along this path is difficult, since it can be unclear which photons will make it to the eye, especially when photons can bounce between objects several times along their path (and in unpredictable ways). To simplify the system, these paths are computed in reverse; that is, rays originate from the position of the eye. Color information, which depends on the scene's light sources, is computed when these rays intersect an object, and is sent back towards the eye to determine the color of any particular pixel.
+<p>The basic idea behind ray tracing is to model the movement of photons as they travel along their path from a light source, to a surface, and finally to a viewer's eye. 
+  Tracing forward along this path is difficult, since it can be unclear which photons will make it to the eye, especially when photons can bounce between objects several times along their path (and in unpredictable ways). 
+  To simplify the system, these paths are computed in reverse; that is, rays originate from the position of the eye. Color information, which depends on the scene's light sources, is computed when these rays intersect an object, and is sent back towards the eye to determine the color of any particular pixel.
 
-<p>In this assignment, you will complete an implementation of a ray tracer.  It will not be able to produce physically accurate images, but later in the semester you will extend it to produce nice looking images with many interesting effects.
+<p>In this assignment, you will complete an implementation of a ray tracer.  
+  It will not be able to produce physically accurate images, but later in the semester you will extend it to produce nice looking images with many interesting effects.
 
 <p>We have provided framework code to save you from spending time on class
 hierarchy design and input/output code, and rather to have you focus on implementing the core ray
@@ -272,8 +275,13 @@ This way, if you manage to get a view direction that actually points <i>into</i>
   to compute the direction that is seen by a ray starting at the surface and proceeding 
   in the direction that is the mirror reflection of the view direction. 
    Compute the reflection direction as discussed in the book (Section 4.8) 
-   and in the slides, find the radiance seen in that direction, scale it by <tt>mirrorCoefficient</tt>, 
-   and add it into <tt>outRadiance</tt>.</p>
+   and in the slides, find the radiance seen in that direction, scale it by <tt>Fresnel reflectance coefficient</tt> and add it into <tt>outRadiance</tt>. 
+  The Fresnel coefficient is computed 
+  \[
+  R(\theta) = R_0 + (1 - R_0)( 1 - \cos \theta)^5
+  \]
+  Where \(theta\) is the angle between incident light and the surface normal at hit point. R_0 is the <code>mirrorCoefficient</code> we passed in in xml file.
+  </p> 
 
 <p>Mirror reflection is not enabled for most scenes because it slows things down a bit; 
   to keep from wasting time when it is turned off, check whether <tt>mirrorCoefficient</tt> 
