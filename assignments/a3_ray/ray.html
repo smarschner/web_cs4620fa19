@@ -15,6 +15,7 @@
 <!-- Please use the <a href="demos/obj_viewer/viewer.html">visualization tool</a> for verifying your answers. -->
 <strong>Points:</strong> 100 <br>
 <strong>Submission:</strong> a ZIP file upload <br>
+<strong>This assignment comes with multiple subtasks, Please make sure to start early.</strong>
 
 <!-- <h3><strong>Due: Friday September 21st 2018 (11:59pm)</strong></h3> -->
 
@@ -26,8 +27,6 @@
   Tracing forward along this path is difficult, since it can be unclear which photons will make it to the eye, especially when photons can bounce between objects several times along their path (and in unpredictable ways). 
   To simplify the system, these paths are computed in reverse; that is, rays originate from the position of the eye. Color information, which depends on the scene's light sources, is computed when these rays intersect an object, and is sent back towards the eye to determine the color of any particular pixel.
 
-<p>In this assignment, you will complete an implementation of a ray tracer.  
-  It will not be able to produce physically accurate images, but later in the semester you will extend it to produce nice looking images with many interesting effects.
 
 <p>We have provided framework code to save you from spending time on class
 hierarchy design and input/output code, and rather to have you focus on implementing the core ray
@@ -78,6 +77,7 @@ solution), and committing your work there. This new commit contains all the fram
   If you don't have the basecode on your machine, you can download it by git clone:</p>
 
 <pre class="dark">git clone https://github.com/smarschner/frameworks_cs4620fa19</pre>
+
 
 Once you have the basecode downloaded, you can find the functions to be implemented by searching <tt>TODO#Ray</tt>.
 To see all these TODO's in Eclipse, select <tt>Search</tt> menu, then <tt>File Search</tt>
@@ -158,6 +158,8 @@ it should interpolate the normals of the three vertices using the barycentric
 coordinates of the hit point. Texture coordinates, if available, should be interpolated using barycentric coordinates as well.
 </ul>
 
+<p> To test your implementation, you can run <tt>SphereTests.java<tt> and <tt>TriangleTests.java</tt> in package <tt>ray1.tests</tt>
+
 <h3>Task 3: Scene (10 points)</h3>
 
 <p>The <tt>Scene</tt> class stores information relating to the composition, 
@@ -175,7 +177,7 @@ i.e. the camera, a list of surfaces, a list of lights, etc. It also contains a s
   with the scene's geometry, even without setting <tt>outRecord</tt> 
   (this version is used to make shadow calculations faster).
 
-
+  <p> To test your implementation, you can run <tt>Scene.java<tt> in package <tt>ray1.tests</tt>
 
 <h3>Task 4: Ray Tracing (10 points)</h3>
 
@@ -264,6 +266,8 @@ Here, \(\mathbf{h} = \frac{\omega_i \,+\, \omega_o}{|\omega_i \,+\, \omega_o|}\)
   \[ f_r(\omega_i,\omega_o,n) \; \max(n \cdot \omega_i, 0) \]
 This way, if you manage to get a view direction that actually points <i>into</i> the surface rather than away from it, you will just return zero.
 </p>
+
+<p>You can validate your implementation of PhongBRDF and LambertianBRDF by running <tt>PhongTesets.java</tt> and <tt>LambertianTests.java</tt> in package <tt>ray1.tests</tt> </p>
 
 <!-- <p>After both BRDFs are completed, you should be able to render <tt>one-sphere.xml</tt>, <tt>teapot.xml</tt>, <tt>wire-box.xml</tt>, <tt>wire-box-orthographic.xml</tt> and the bunny scenes correctly.
  -->
