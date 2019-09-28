@@ -56,7 +56,7 @@ In this assignment, your ray tracer will have support for:
   <!-- <li>Recursive refectance/refractance (Extra credit)</li> -->
 </ul>
 
-<p>Your ray tracer will read files in an XML file format and output images in the OpenEXR high-dynamic-range (HDR) image format. We have split ray tracing in CS4620 into two parts. For now, you will implement basic ray tracing. Later in the next assignment, after you have learned accelerate structure, you will implement features for faster rendering. In this document, we focus on what you need to implement the basic elements of a ray tracer.
+<p>Your ray tracer will read files in an XML file format and output images in the OpenEXR high-dynamic-range (HDR) image format. We have split ray tracing in CS4620 into two parts. For now, you will implement basic ray tracing. Later in the next assignment, after you have learned accelerate structures, you will implement features for faster rendering. In this document, we focus on what you need to implement the basic elements of a ray tracer.
 
 <h5>Precisions in the programming assignment</h5>
 <p>All the input in this project is parsed in single precision and the scene is stored in single precision as well.  This is a good practice since scene data in real systems can occupy a lot of memory. But accurate ray intersections and shadows are difficult to achieve with single precision.  So you should carry out all the geometric calculations, and store all related intermediate results, in double precision.
@@ -275,7 +275,7 @@ This way, if you manage to get a view direction that actually points <i>into</i>
 </ul>
 
 
-<h5>Mirror reflection</h5>
+<h5><strong>Mirror reflection</strong></h5>
 
 <p>Once you have shading based on illumination from light sources working, 
   there is one more kind of reflection to include: reflections of objects in one another's surfaces.  Doing this accurately and consistently with shading from BRDFs is a topic for later in the semester, but for this assignment we simply add a completely separate mirror 
@@ -341,7 +341,7 @@ with an appropriate substitution to the library path for Windows or Linux.
 significant differences, consider checking for bugs in your code.
 
 <h4>Appendix B: Extra Credit</h4>
-<h5>Cylinder surface</h5>
+<h5><strong>Cylinder surface</strong></h5>
 <ul>
   <p>We've included a <tt>Cylinder</tt> subclass of <tt>Surface</tt>, similar to the <tt>Triangle</tt> and <tt>Sphere</tt> classes. The class contains <tt>center</tt>, a 3D point, and <tt>radius</tt>, <tt>height</tt>, both real numbers. Assume that the cylinder is capped, i.e., the top and bottom have caps (it is not a hollow tube). Also, assume it is aligned with the z-axis, and is centered around <tt>center</tt>; <br>
   i.e., if
@@ -352,7 +352,7 @@ significant differences, consider checking for bugs in your code.
   <p>Once this is done, try implementing a cylinder that is arbitrarily oriented. You will need to add two parameters, <tt>rotX</tt> and <tt>rotY</tt>, to specify the cylinder's rotation about the x and y axes. Note that this will require changing the coordinate system of the incoming ray within the <tt> intersect</tt> method to account for these rotations. After the coordinate system change, the math used to intersect the ray with the cylinder should be the same as its axis-aligned variant. Finally, build a test scene with a cylinder object.
 </ul>
 
-<h5>Microfacet BRDF</h5>
+<h5><Strong>Microfacet BRDF</Strong></h5>
 <ul>
 <li><strong><tt>MicrofacetBRDF</tt></strong>: This and its two subclasses implement two variants of the Microfacet BRDF model. Its BRDF function is product of several factors:
   <ul style="list-style: none; text-align: center;">
