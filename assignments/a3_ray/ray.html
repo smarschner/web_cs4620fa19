@@ -212,11 +212,13 @@ the light that comes from the incoming direction \(\omega_i\) (i.e. the directio
 
 <p>The idea is to compute shading using a common formula that works for all the models:
   \[
-  L_o(\omega_o) = L_a = f_r(\mathbf{x}, \omega_i, \omega_o) 
+  L_o(\omega_o) = L_d = f_r(\mathbf{x}, \omega_i, \omega_o) 
         \max(\mathbf{n} \cdot \omega_i, 0) \frac{I}{r^2}
   \]
 
-where \(\omega_i\) is a unit vector towards the light,  \(L_a\) is the ambient light reflection,  \(\omega_o\) is a unit vector toward the viewer, \(\mathbf{x}\) is a location on the surface, and \(\mathbf{n}\) is the surface normal at \(\mathbf{x}\). \(I\) and \(r^2\) are the intensity and distance of the light source, respectively.  The function \(f_r\) is the BRDF of the surface, and it is different for each material.  The BRDF is represented by the <tt>BRDF</tt> class, with its key method
+where \(\omega_i\) is a unit vector towards the light,  \(L_d\) is the direct luminance from the light,  \(\omega_o\) is a unit vector toward the viewer, \(\mathbf{x}\) is a location on the surface, and \(\mathbf{n}\) is the surface normal at \(\mathbf{x}\).
+The dot product term is where you make sure the radiance from light sources are counted in terms of projected unit area. The max term is used to handle the case where you have the viewing direction off the horizontal line of the hitting point.
+ \(I\) and \(r^2\) are the intensity and distance of the light source, respectively.  The function \(f_r\) is the BRDF of the surface, and it is different for each material.  The BRDF is represented by the <tt>BRDF</tt> class, with its key method
 <p>
 <code>
   public abstract void evalBRDF(
@@ -231,6 +233,7 @@ where \(\omega_i\) is a unit vector towards the light,  \(L_a\) is the ambient l
   <li><tt><strong>ReflectionShader</tt></strong>: In the <code>shade</code> method you will basically evaluate the expression above for \(L_o\) (which corresponds to the output parameter <tt>outRadiance</tt>), using the provided parameters.</p>
 
   <p>Notice that these values should be computed once for each light in the scene, and the contributions from each light should be summed, unless something is blocking the path from the light source to the object.  Check whether your shading point is shadowed by constructing a ray segment (meaning a <tt>Ray</tt> that has both a starting and ending \(t\) value) that starts at your shading point and ends at the light source, then calling <tt>scene.getAnyIntersection</tt> to check whether it intersects any surfaces.  Don't forget to offset the start of the ray; <tt>Ray.makeOffsetSegment</tt> is the ideal tool for making shadow rays.
+    Don't forget to check whether the viewing direction and the light incomming direction are off the horizontal line, if any of them is, this ray should give zero contribution to the Colorf.
 
 <pre>
  <strong>reset</strong> <tt>outRadiance</tt> to (0, 0, 0)
@@ -262,11 +265,6 @@ Section 4.5.1 of the book is relevant, but note that there are several differenc
 Here, \(\mathbf{h} = \frac{\omega_i \,+\, \omega_o}{|\omega_i \,+\, \omega_o|}\). See section
 4.5.2 with the same caution as above.</li>
 
-<p>To avoid some weird artifacts related to the difference between shading normals and geometric normals, after the BRDF function value \(f_r(\omega_i,\omega_o,n)\) computed, the <tt>evalBRDF</tt> function should set <tt>BRDFValue</tt> to:
-  \[ f_r(\omega_i,\omega_o,n) \; \max(n \cdot \omega_i, 0) \]
-This way, if you manage to get a view direction that actually points <i>into</i> the surface rather than away from it, you will just return zero.
-</p>
-
 <p>You can validate your implementation of PhongBRDF and LambertianBRDF by running <tt>PhongTesets.java</tt> and <tt>LambertianTests.java</tt> in package <tt>ray1.tests</tt> </p>
 
 <!-- <p>After both BRDFs are completed, you should be able to render <tt>one-sphere.xml</tt>, <tt>teapot.xml</tt>, <tt>wire-box.xml</tt>, <tt>wire-box-orthographic.xml</tt> and the bunny scenes correctly. -->
@@ -277,7 +275,7 @@ This way, if you manage to get a view direction that actually points <i>into</i>
 
 <h5><strong>Mirror reflection</strong></h5>
 
-<p>Once you have shading based on illumination from light sources working, 
+<p>Once you have shading based on direct illumination from light sources working, 
   there is one more kind of reflection to include: reflections of objects in one another's surfaces.  Doing this accurately and consistently with shading from BRDFs is a topic for later in the semester, but for this assignment we simply add a completely separate mirror 
   reflection component to the shading.  It is computed independently of the shading computed using light sources and BRDFs, and it's controlled by the parameter <tt>mirrorCoefficient</tt>, which is defined in 
     <tt>ReflectionShader</tt> and therefore available for all shaders that are subclasses. 
@@ -285,7 +283,7 @@ This way, if you manage to get a view direction that actually points <i>into</i>
 </p>
 
 \[
-L_o(\omega_o) = L_a + L_r = L_a + R(\theta) L_o(\omega_r)
+L_o(\omega_o) = L_d + L_r = L_d + R(\theta) L_o(\omega_r)
 \]
   
 <p>Where \(L_o\) is the final intensity we compute in <code>ReflectionShade.shade</code>, \(L_r\) is the mirror reflectance we want compute in this task, \(\omega_r\) is the mirror reflection direction.  \(\theta\) is the angle between outgoing direction and the surface normal at hit point \(\mathbf{x}\).
