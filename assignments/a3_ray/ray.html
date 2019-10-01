@@ -217,7 +217,7 @@ the light that comes from the incoming direction \(\omega_i\) (i.e. the directio
   \]
 
 where \(\omega_i\) is a unit vector towards the light,  \(L_d\) is the directly reflected light,  \(\omega_o\) is a unit vector toward the viewer, \(\mathbf{x}\) is a location on the surface, and \(\mathbf{n}\) is the surface normal at \(\mathbf{x}\).
-The dot product term is where you make sure the radiance from light sources are counted in terms of projected unit area. The max term is used to handle the case where the light is coming from behind the surface, in which case it should not contribute to shading..
+The dot product term is where you make sure the radiance from light sources are counted in terms of projected unit area. The max term is used to handle the case where the light is coming from behind the surface, in which case it should not contribute to shading.
  \(I\) and \(r^2\) are the intensity and distance of the light source, respectively.  The function \(f_r\) is the BRDF of the surface, and it is different for each material.  The BRDF is represented by the <tt>BRDF</tt> class, with its key method
 <p>
 <code>
