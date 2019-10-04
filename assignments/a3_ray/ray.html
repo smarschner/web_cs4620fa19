@@ -159,6 +159,7 @@ coordinates of the hit point. Texture coordinates, if available, should be inter
 </ul>
 
 <p> To test your implementation, you can run <tt>SphereTests.java</tt> and <tt>TriangleTests.java</tt> in package <tt>ray1.tests</tt></p>
+<p> You will be able to test your texture coords using the scene files in textured_scenes folder after you had Task 5 implemented.</p>
 
 <h3>Task 3: Scene (10 points)</h3>
 
@@ -216,8 +217,8 @@ the light that comes from the incoming direction \(\omega_i\) (i.e. the directio
         \max(\mathbf{n} \cdot \omega_i, 0) \frac{I}{r^2}
   \]
 
-where \(\omega_i\) is a unit vector towards the light,  \(L_d\) is the direct luminance from the light,  \(\omega_o\) is a unit vector toward the viewer, \(\mathbf{x}\) is a location on the surface, and \(\mathbf{n}\) is the surface normal at \(\mathbf{x}\).
-The dot product term is where you make sure the radiance from light sources are counted in terms of projected unit area. The max term is used to handle the case where you have the viewing direction off the horizontal line of the hitting point.
+where \(\omega_i\) is a unit vector towards the light,  \(L_d\) is the directly reflected light,  \(\omega_o\) is a unit vector toward the viewer, \(\mathbf{x}\) is a location on the surface, and \(\mathbf{n}\) is the surface normal at \(\mathbf{x}\).
+The dot product term is where you make sure the radiance from light sources are counted in terms of projected unit area. The max term is used to handle the case where the light is coming from behind the surface, in which case it should not contribute to shading.
  \(I\) and \(r^2\) are the intensity and distance of the light source, respectively.  The function \(f_r\) is the BRDF of the surface, and it is different for each material.  The BRDF is represented by the <tt>BRDF</tt> class, with its key method
 <p>
 <code>
@@ -233,7 +234,7 @@ The dot product term is where you make sure the radiance from light sources are 
   <li><tt><strong>ReflectionShader</tt></strong>: In the <code>shade</code> method you will basically evaluate the expression above for \(L_o\) (which corresponds to the output parameter <tt>outRadiance</tt>), using the provided parameters.</p>
 
   <p>Notice that these values should be computed once for each light in the scene, and the contributions from each light should be summed, unless something is blocking the path from the light source to the object.  Check whether your shading point is shadowed by constructing a ray segment (meaning a <tt>Ray</tt> that has both a starting and ending \(t\) value) that starts at your shading point and ends at the light source, then calling <tt>scene.getAnyIntersection</tt> to check whether it intersects any surfaces.  Don't forget to offset the start of the ray; <tt>Ray.makeOffsetSegment</tt> is the ideal tool for making shadow rays.
-    Don't forget to check whether the viewing direction and the light incomming direction are off the horizontal line, if any of them is, this ray should give zero contribution to the Colorf.
+    Don't forget to check whether the viewing direction and the light incomming direction are facing away from the shading normal., if any of them is, this ray should give zero contribution to the Colorf.
 
 <pre>
  <strong>reset</strong> <tt>outRadiance</tt> to (0, 0, 0)
@@ -279,7 +280,7 @@ Here, \(\mathbf{h} = \frac{\omega_i \,+\, \omega_o}{|\omega_i \,+\, \omega_o|}\)
   there is one more kind of reflection to include: reflections of objects in one another's surfaces.  Doing this accurately and consistently with shading from BRDFs is a topic for later in the semester, but for this assignment we simply add a completely separate mirror 
   reflection component to the shading.  It is computed independently of the shading computed using light sources and BRDFs, and it's controlled by the parameter <tt>mirrorCoefficient</tt>, which is defined in 
     <tt>ReflectionShader</tt> and therefore available for all shaders that are subclasses. 
-  Then with this mirror reflection, the outgoing refectance turns out to be the sum of reflected ambient light  /( L_a/) and mirror reflected light /( L_r /).
+  Then with this mirror reflection, the outgoing refectance turns out to be the sum of direct reflected light \( L_d\) and mirror reflected light \( L_r \).
 </p>
 
 \[
@@ -432,7 +433,7 @@ Here we attached a note of the scenes that you can test for different materials:
 </ul>
 
 
-  <tt><strong>Textures</strong></tt>
+  <!-- <tt><strong>Textures</strong></tt>
 
 <p>The <tt>Shader</tt> classes above have a <tt>texture</tt> field that is by default set to <tt>null</tt>. If the scene XML file specifies an image texture for the shader, a <tt>Texture</tt> object will be referenced by this field.  In this case, you should use the texture to determine the diffuse color in the <tt>shade</tt> method, ignoring the <tt>diffuseColor</tt> field.</p>
 
@@ -446,7 +447,7 @@ Here we attached a note of the scenes that you can test for different materials:
   <li><strong><tt>RepeatTexture</tt></strong>: This class repeats the texture for out-of-range UV-coordinates. In this case, copies of the texture are tiled across UV space.
 </ul>
 
-<p>The details of how to implement these are provided in the code.  Once these are completed, all scenes in subdirectory <tt>textured_scenes</tt> should render correctly.</li>
+<p>The details of how to implement these are provided in the code.  Once these are completed, all scenes in subdirectory <tt>textured_scenes</tt> should render correctly.</li> -->
 
 
 <h4>Appendix C: Framework</h4>
