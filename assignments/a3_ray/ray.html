@@ -21,16 +21,16 @@
 <h3>1. Introduction:</h3>
 <p>Recall that in the previous assignment, you are asked to check the intersection for each ray by looping over all the meshes in the scene. 
 It takes over one minute to render a teapot, which is inefficient. 
-Here in this assignment you are going to implement a simple acceleration structure called axis-aligned bouding volume hierarchy(BVH) 
-to speed up the rendering process. It is a tree whose leaves are surfaces in the scene. Each of this internal nodes contains an axis-aligned 
-bounding box(AABB) that contains all the surface in the subtree rooted at that node. 
+Here in this assignment you are going to implement a simple acceleration structure called axis-aligned bouding volume hierarchy (BVH) 
+to speed up the rendering process. It is a tree whose leaves are surfaces in the scene. Each of its internal nodes contains an axis-aligned 
+bounding box (AABB) that contains all the surfaces in the subtree rooted at that node. 
 </p>
 
 <p>An axis-aligned bounding box is defined by two 3D points \( (x_{\min}, y_{\min}, z_{\min}) \) and \( (x_{\max}, y_{\max}, z_{\max}) \) as shown in the following image.
-  The box itself is the Caresian product of three intervals in each dimension.
+  The box itself is the Caresian product of three intervals, one in each dimension.
 </p>
 
-\[ [x_{\min}; x_{\max}] \times [y_{\min}; y_{\max}] \times [z_{\min}, z_{\max}] \]
+\[ [x_{\min}, x_{\max}] \times [y_{\min}, y_{\max}] \times [z_{\min}, z_{\max}] \]
 
 <div class="thumbnails" style="text-align: center">
     <img src="images/a3/bbox.jpg" width="50%" style="margin-right: 10px">
@@ -39,17 +39,17 @@ bounding box(AABB) that contains all the surface in the subtree rooted at that n
       </div>
 </div>
 <h3>2. Programming Tasks:</h3>
-<p> This assignment is built on the part 1 code, in case of this codebase conflicting with your implementation in part 1, we suggest you to duplicate and store your ray trace part 1
-  somewhere so that you can have some backup to come back if any break.</p>
+<p> This assignment is built on the part 1 code, you will want to commit your changes before pulling, if you are not confident with git, 
+  we suggest you to duplicate and store your ray tracing part 1 somewhere so that you can have some backup to come back to. </p>
 <p>To get the basecode, if you already have the course framework repository on your machine, do <code>git pull</code> in the folder "frameworks_cs4620fa19/".
   If you don't have the basecode on your machine, you can download it by git clone:</p>
 <pre class="dark">git clone https://github.com/smarschner/frameworks_cs4620fa19</pre>
-Once you have the basecode downloaded, you may first solve some merge conflicts if they present.
+Once you have the basecode downloaded, you may first solve any merge conflicts if they are present.
 Then you can find the functions to be implemented in <code>accel.BboxUtils.java</code>, <code>accel.Bvh.java</code> and <code>accel.BvhNode.java</code>.
 
 
 
-<p>Since we are not looping over all the scene surface to find the intersection any more, you need to first modify the code in method <code>intersect</code> 
+<p>Since we are not looping over all the scene surfaces to find the intersection any more, you need to first modify the code in method <code>intersect</code> 
 and <code>getAnyIntersection</code> in <code>Scene.java</code>.
 
 You can also find those change to be made by searching <tt>TODO#Ray Part 2:</tt>.
@@ -60,28 +60,28 @@ recommend implementation in the following order.
 
 <h3>Task 1: Computing the Bounding-Box (30%)</h3>
 
-<p>A boundng box encloses primitive for the internal nodes. Before constructing the accelerate structure, you need to be able to compute boundingBox 
-for all the subclasses of Surface except Mesh. You can find the function to be implemented in the <code>BboxUtils.java</code>. 
-Basically, the  <code>triangleBBox</code> and <code>sphereBBox</code> compute bounding box for sphere and triangle respectively.
+<p>A boundng box encloses the primitive with in internal node. Before constructing the acceleration structure, you need to be able to compute bounding boxes
+for all the subclasses of <tt>Surface</tt> except Mesh. You can find the functions to be implemented in  <code>BboxUtils.java</code>. 
+Basically, the  <code>triangleBBox</code> and <code>sphereBBox</code> compute bounding boxes for spheres and triangles respectively.
 
-<p>A bounding box for a surface is represented by three variables: <code>Surface.minBound</code>, <code>Surface.maxBound</code> and <code>Surface.averagePosition</code>, 
-you can find their definition in <code>Surface.java</code>.  After calling these method, the AABB defined by minBound and maxBound should contain the represented surface entirely, 
+<p>A bounding box for a surface is represented by three variables: <code>Surface.minBound</code>, <code>Surface.maxBound</code> and <code>Surface.averagePosition</code>.
+you can find their definitions in <code>Surface.java</code>.  After calling one of the method in BboxUtils, the AABB defined by minBound and maxBound should contain the surface entirely, 
 and averagePosition should be a 3D position inside the AABB that can be regarded as the center of the surface.
 
 <h3>Task 2: Building BVH Tree (30%)</h3>
-<p>After implementing all the computeBoundingBox methods, you are ready to complete the Bvh class. In this task, you need to fill in the code of <code>createTree(int start, int end</code> in BvhNode.java. 
-  This method create a BVH [sub]tree. 
+<p>After implementing all the computeBoundingBox methods, you are ready to complete the Bvh class. In this task, you need to fill in the code of <code>createTree(int start, int end)</code> in BvhNode.java. 
+  This method creates a BVH [sub]tree. 
 
 <p>Each node in the BVH is represented by an instance of the <code>BvhNode</code> class. 
-The root node is stored in the root field of the Bvh class. The surfaces that the BVH manages are not stored in the nodes, but they are stored all in one place in the surfaces array in the Bvh class. 
-Each BvhNode contains the surfaceIndexStart and surfaceIndexEnd subjected to the following invariant:
+The root node is stored in the <code>root</code> field of the Bvh class. The surfaces that the BVH manages are not stored in the nodes, but they are stored all in one place in the surfaces array in the Bvh class. 
+Each BvhNode contains the fields <code>surfaceIndexStart</code> and <code>surfaceIndexEnd</code> subject to the following invariant:
 
-<p>Surfaces stored in surfaces with indices from surfaceIndexStart to surfaceIndexEnd-1 are contained in the subtree rooted at the node.
+<p>Surfaces stored in surfaces with indices from <tt>surfaceIndexStart </tt>to <tt>surfaceIndexEnd-1</tt> are contained in the subtree rooted at the node.
 
-<p>BvhNode also contains the minBound and maxBound fields that define the AABB correponding to the node. 
+<p>BvhNode also contains the <code>minBound</code> and <code>maxBound</code> fields that define the AABB corresponding to the node. 
 Moreover, it has child array which contains the references to its left child and right child. You need to implement the <code>createTree(int start, int end)</code> method of the <code>Bvh</code> class. 
-This method should create and return a BvhNode that contains surfaces from surfaces[start] to surfaces[end-1] in its subtree. 
-To do so, you need to divide the surfaces into two groups by sorting their averagePosition and modifying the surfaces array so that the first group is in the left half and the second group is in the right half of the array. 
+This method should create and return a BvhNode that contains surfaces from <code>surfaces[start]</code> to <code>surfaces[end-1]</code> in its subtree. 
+To do so, you need to divide the surfaces into two group sorting by their <tt>averagePosition </tt> and modify the surfaces array so that the first group is in the left half and the second group is in the right half of the array. 
 Then, you call createTree recursively on the left and the right half to get two BvhNodes that will become the two children of the BvhNode that you construct for the original call to createTree. More details can be found in the comments in the code base.
 
 <div class="thumbnails" style="text-align: center">
@@ -93,25 +93,27 @@ Then, you call createTree recursively on the left and the right half to get two 
       </div>
 </div>
 
-<h3>Task 3: Intersecting Bounding-Box (40%)</h3>
-<p>Then, you will implement the <code>intersects(Ray ray)</code> method of the <code>BvhNode</code> class. This method only checks whether the given ray intersects the AABB of the BvhNode or not. 
-  There is no need to compute the intersection point or other associated information.
-Lastly, you need to implement the <code>intersectHelper(BvhNode node, IntersectionRecord outRecord, Ray rayIn, boolean anyIntersection)</code> method of the <code>Bvh</code> class. This method checks whether the given ray intersects any surface contained in the subtree rooted at the given BvhNode. 
-First, you should check whether the ray hits the node or not by calling the intersects method of the BvhNode class. 
-If not, the method can return immediately. (This check is the key why ray intersection becomes much faster with a BVH.) 
+<h3>Task 3: Ray Intersection (40%)</h3>
+<p>Then, you will implement the <code>intersects(Ray ray)</code> method of the <code>BvhNode</code> class. This method only checks whether the given ray intersects the AABB of the <tt>BvhNode</tt> or not. 
+  There is no need to compute the intersection point or other associated information. 
+Lastly, you need to implement the <code>intersectHelper(BvhNode node, IntersectionRecord outRecord, Ray rayIn, boolean anyIntersection)</code> method of the <code>Bvh</code> class. 
+This method checks whether the given ray intersects any surface contained in the subtree rooted at the given BvhNode. 
+First, you should check whether the ray hits the node or not by calling the <code>intersects</code> method of the <tt>BvhNode</tt> class. 
+If not, the method can return immediately. (This check is the key to why ray intersection becomes much faster with a BVH.) 
 Otherwise, if the BvhNode is a leaf, you intersect the ray with the surfaces with indices from surfaceIndexStart to surfaceIndexEnd-1 one by one. 
-On the other hand, if the BvhNode is an internal node, you call intersectHelper recursively on its two children.
+On the other hand, if the BvhNode is an internal node, you call intersectHelper recursively on its two children. In both cases, do remember to upate the smallest <tt>t</tt> in the 
+intersection records to make sure you return the interestion with smallest <tt>t</tt>.
 
 
 <h3>Test your code</h3>
 
 <P>
-  To test your code, you can first run the <code>BvhTest.java</code> to check the correctness of your implementation of computing bounding box, box intersecting, and Bvh construction.
-  For the intersection and construction test, if there is anything going wrong with your results, there will be assert messages in console log, otherwise it only log the info of built BVH structure.
+  To test your code, you can first run the <code>BvhTest.java</code> to check the correctness of your implementation of computing bounding boxes, box intersection, and Bvh construction.
+  For the intersection and construction tests, if there is anything going wrong with your results, there will be assert messages in console log, otherwise there will only be some info about BVH structure.
 </P>
 
 <p>
-  Once you have all the simple test passed, you can try to render the scene provided in "complex_mesh" folder. You will be able to render the teapot scene within few seconds!
+  Once you have all the simple test passed, you can try to render the scenes provided in the "complex_meshes" folder. You will be able to render the teapot scene within few seconds!
 </p>
 
 <h4>What to Submit</h4>
@@ -550,21 +552,6 @@ Here we attached a note of the scenes that you can test for different materials:
 </ul>
 
 
-  <!-- <tt><strong>Textures</strong></tt>
-
-<p>The <tt>Shader</tt> classes above have a <tt>texture</tt> field that is by default set to <tt>null</tt>. If the scene XML file specifies an image texture for the shader, a <tt>Texture</tt> object will be referenced by this field.  In this case, you should use the texture to determine the diffuse color in the <tt>shade</tt> method, ignoring the <tt>diffuseColor</tt> field.</p>
-
-<p>You will see that all the <tt>ReflectionShader</tt> subclasses set up the <tt>BRDF</tt>s with a reference to the texture also.  Thus, whenever you are computing diffuse shading, you should get the reflectance from the texture if available, and otherwise the diffuse color.  This logic is encapsulated in the helper method <tt>BRDF.getDiffuseReflectance</tt> which is available to all the BRDF methods you're implementing.
-
-<p>The <tt>Texture</tt> class and its subclasses are responsible for using the UV-coordinates of a particular point on the <tt>Surface</tt> to find this color on a given image (located in the <tt>Texture</tt> class). You will be implementing the <tt>getTexColor(Vector2d texCoord)</tt> method for two very similar subclasses of
- <tt>Texture</tt>. Both classes convert UV-coordinates into the nearest pixel coordinates corresponding to the image. The difference is in the way they handle UV-coordinates outside of the [0.0, 1.0] range:
-
-<ul style="list-style: none;">
-  <li><strong><tt>ClampTexture</tt></strong>: This class uses the nearest pixel for UV-coordinates that are out of range. As a result, the colors of the boundary pixels of a texture are extended outwards in UV space.
-  <li><strong><tt>RepeatTexture</tt></strong>: This class repeats the texture for out-of-range UV-coordinates. In this case, copies of the texture are tiled across UV space.
-</ul>
-
-<p>The details of how to implement these are provided in the code.  Once these are completed, all scenes in subdirectory <tt>textured_scenes</tt> should render correctly.</li> -->
 
 
 <h4>Appendix C: Framework</h4>
@@ -594,6 +581,23 @@ code to get and set pixels and to output the image to a file.
 as well as RGB colors. They support all the standard vector arithmetic
 operations you're likely to need, including dot and cross products
 for vectors and addition and scaling for colors.
+
+<!-- <tt><strong>Textures</strong></tt>
+
+<p>The <tt>Shader</tt> classes above have a <tt>texture</tt> field that is by default set to <tt>null</tt>. If the scene XML file specifies an image texture for the shader, a <tt>Texture</tt> object will be referenced by this field.  In this case, you should use the texture to determine the diffuse color in the <tt>shade</tt> method, ignoring the <tt>diffuseColor</tt> field.</p>
+
+<p>You will see that all the <tt>ReflectionShader</tt> subclasses set up the <tt>BRDF</tt>s with a reference to the texture also.  Thus, whenever you are computing diffuse shading, you should get the reflectance from the texture if available, and otherwise the diffuse color.  This logic is encapsulated in the helper method <tt>BRDF.getDiffuseReflectance</tt> which is available to all the BRDF methods you're implementing.
+
+<p>The <tt>Texture</tt> class and its subclasses are responsible for using the UV-coordinates of a particular point on the <tt>Surface</tt> to find this color on a given image (located in the <tt>Texture</tt> class). You will be implementing the <tt>getTexColor(Vector2d texCoord)</tt> method for two very similar subclasses of
+ <tt>Texture</tt>. Both classes convert UV-coordinates into the nearest pixel coordinates corresponding to the image. The difference is in the way they handle UV-coordinates outside of the [0.0, 1.0] range:
+
+<ul style="list-style: none;">
+  <li><strong><tt>ClampTexture</tt></strong>: This class uses the nearest pixel for UV-coordinates that are out of range. As a result, the colors of the boundary pixels of a texture are extended outwards in UV space.
+  <li><strong><tt>RepeatTexture</tt></strong>: This class repeats the texture for out-of-range UV-coordinates. In this case, copies of the texture are tiled across UV space.
+</ul>
+
+<p>The details of how to implement these are provided in the code.  Once these are completed, all scenes in subdirectory <tt>textured_scenes</tt> should render correctly.</li> -->
+
 
 <h5><strong>Parser</strong></h5>
 
