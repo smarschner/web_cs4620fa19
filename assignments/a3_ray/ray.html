@@ -7,6 +7,123 @@
 
 <!-- <h3>Programming Part</h3> -->
 
+<h4><strong>B. Ray Tracing Part 2</strong></h4>
+<p>
+<strong>Due: Friday, Oct 11 2019 (11:59pm)</strong> <br>
+<!-- <strong>File: </strong> <a class="link" href="materials/mesh.pdf">Mesh(pdf)</a><br> -->
+<!-- <p> -->
+<!-- Please use the <a href="demos/obj_viewer/viewer.html">visualization tool</a> for verifying your answers. -->
+<strong>Points:</strong> 100 <br>
+<strong>Submission:</strong> a ZIP file upload <br>
+<strong>This assignment comes with multiple subtasks, Please make sure to start early.</strong>
+
+
+<h3>1. Introduction:</h3>
+<p>Recall that in the previous assignment, you are asked to check the intersection for each ray by looping over all the meshes in the scene. 
+It takes over one minute to render a teapot, which is inefficient. 
+Here in this assignment you are going to implement a simple acceleration structure called axis-aligned bouding volume hierarchy(BVH) 
+to speed up the rendering process. It is a tree whose leaves are surfaces in the scene. Each of this internal nodes contains an axis-aligned 
+bounding box(AABB) that contains all the surface in the subtree rooted at that node. 
+</p>
+
+<p>An axis-aligned bounding box is defined by two 3D points \( (x_{\min}, y_{\min}, z_{\min}) \) and \( (x_{\max}, y_{\max}, z_{\max}) \) as shown in the following image.
+  The box itself is the Caresian product of three intervals in each dimension.
+</p>
+
+\[ [x_{\min}; x_{\max}] \times [y_{\min}; y_{\max}] \times [z_{\min}, z_{\max}] \]
+
+<div class="thumbnails" style="text-align: center">
+    <img src="images/a3/bbox.jpg" width="50%" style="margin-right: 10px">
+      <div class="caption">
+        Bounding Box.
+      </div>
+</div>
+<h3>2. Programming Tasks:</h3>
+<p> This assignment is built on the part 1 code, in case of this codebase conflicting with your implementation in part 1, we suggest you to duplicate and store your ray trace part 1
+  somewhere so that you can have some backup to come back if any break.</p>
+<p>To get the basecode, if you already have the course framework repository on your machine, do <code>git pull</code> in the folder "frameworks_cs4620fa19/".
+  If you don't have the basecode on your machine, you can download it by git clone:</p>
+<pre class="dark">git clone https://github.com/smarschner/frameworks_cs4620fa19</pre>
+Once you have the basecode downloaded, you may first solve some merge conflicts if they present.
+Then you can find the functions to be implemented in <code>accel.BboxUtils.java</code>, <code>accel.Bvh.java</code> and <code>accel.BvhNode.java</code>.
+
+
+
+<p>Since we are not looping over all the scene surface to find the intersection any more, you need to first modify the code in method <code>intersect</code> 
+and <code>getAnyIntersection</code> in <code>Scene.java</code>.
+
+You can also find those change to be made by searching <tt>TODO#Ray Part 2:</tt>.
+To see all these TODO's in Eclipse, select <tt>Search</tt> menu, then <tt>File Search</tt>
+and type <tt>"TODO#Ray Part 2:"</tt>. There are quite a few separate code snippets to
+complete in this assignment. To check your progress as you go along, we
+recommend implementation in the following order.
+
+<h3>Task 1: Computing the Bounding-Box (30%)</h3>
+
+<p>A boundng box encloses primitive for the internal nodes. Before constructing the accelerate structure, you need to be able to compute boundingBox 
+for all the subclasses of Surface except Mesh. You can find the function to be implemented in the <code>BboxUtils.java</code>. 
+Basically, the  <code>triangleBBox</code> and <code>sphereBBox</code> compute bounding box for sphere and triangle respectively.
+
+<p>A bounding box for a surface is represented by three variables: <code>Surface.minBound</code>, <code>Surface.maxBound</code> and <code>Surface.averagePosition</code>, 
+you can find their definition in <code>Surface.java</code>.  After calling these method, the AABB defined by minBound and maxBound should contain the represented surface entirely, 
+and averagePosition should be a 3D position inside the AABB that can be regarded as the center of the surface.
+
+<h3>Task 2: Building BVH Tree (30%)</h3>
+<p>After implementing all the computeBoundingBox methods, you are ready to complete the Bvh class. In this task, you need to fill in the code of <code>createTree(int start, int end</code> in BvhNode.java. 
+  This method create a BVH [sub]tree. 
+
+<p>Each node in the BVH is represented by an instance of the <code>BvhNode</code> class. 
+The root node is stored in the root field of the Bvh class. The surfaces that the BVH manages are not stored in the nodes, but they are stored all in one place in the surfaces array in the Bvh class. 
+Each BvhNode contains the surfaceIndexStart and surfaceIndexEnd subjected to the following invariant:
+
+<p>Surfaces stored in surfaces with indices from surfaceIndexStart to surfaceIndexEnd-1 are contained in the subtree rooted at the node.
+
+<p>BvhNode also contains the minBound and maxBound fields that define the AABB correponding to the node. 
+Moreover, it has child array which contains the references to its left child and right child. You need to implement the <code>createTree(int start, int end)</code> method of the <code>Bvh</code> class. 
+This method should create and return a BvhNode that contains surfaces from surfaces[start] to surfaces[end-1] in its subtree. 
+To do so, you need to divide the surfaces into two groups by sorting their averagePosition and modifying the surfaces array so that the first group is in the left half and the second group is in the right half of the array. 
+Then, you call createTree recursively on the left and the right half to get two BvhNodes that will become the two children of the BvhNode that you construct for the original call to createTree. More details can be found in the comments in the code base.
+
+<div class="thumbnails" style="text-align: center">
+    <img src="images/a3/accel.jpg" width="50%" style="margin-right: 10px">
+      <div class="caption">
+        An example of BVH (Each of its leaf contains 2 surface). 
+        <br>"START" stands for the index in the surface array of the left most surface belong to this node. 
+        <br>"END" stands for the index in the surface array of the right most surface belong to this node. 
+      </div>
+</div>
+
+<h3>Task 3: Intersecting Bounding-Box (40%)</h3>
+<p>Then, you will implement the <code>intersects(Ray ray)</code> method of the <code>BvhNode</code> class. This method only checks whether the given ray intersects the AABB of the BvhNode or not. 
+  There is no need to compute the intersection point or other associated information.
+Lastly, you need to implement the <code>intersectHelper(BvhNode node, IntersectionRecord outRecord, Ray rayIn, boolean anyIntersection)</code> method of the <code>Bvh</code> class. This method checks whether the given ray intersects any surface contained in the subtree rooted at the given BvhNode. 
+First, you should check whether the ray hits the node or not by calling the intersects method of the BvhNode class. 
+If not, the method can return immediately. (This check is the key why ray intersection becomes much faster with a BVH.) 
+Otherwise, if the BvhNode is a leaf, you intersect the ray with the surfaces with indices from surfaceIndexStart to surfaceIndexEnd-1 one by one. 
+On the other hand, if the BvhNode is an internal node, you call intersectHelper recursively on its two children.
+
+
+<h3>Test your code</h3>
+
+<P>
+  To test your code, you can first run the <code>BvhTest.java</code> to check the correctness of your implementation of computing bounding box, box intersecting, and Bvh construction.
+  For the intersection and construction test, if there is anything going wrong with your results, there will be assert messages in console log, otherwise it only log the info of built BVH structure.
+</P>
+
+<p>
+  Once you have all the simple test passed, you can try to render the scene provided in "complex_mesh" folder. You will be able to render the teapot scene within few seconds!
+</p>
+
+<h4>What to Submit</h4>
+<p>Submit a ZIP file containing your solution organized the same way as the code on Github, along with any additional files.
+Include a readme in your zip that contains:
+<ul>
+  <li>You and your partner's names and NetIDs.
+  <li>Any problems with your solution.
+  <li>Anything else you want us to know.
+</ul>
+<p><strong><a href=https://cms.csuglab.cornell.edu>Upload here (CMS)</a></strong>
+
 <h4><strong>A. Ray Tracing Part 1</strong></h4>
 <p>
 <strong>Due: Monday, Oct 7 2019 (11:59pm)</strong> <br>
@@ -110,7 +227,7 @@ recommend implementation in the following order.
     The <tt>writeHDR</tt> variable in <tt>RayTracer</tt> can be set to false to output PNG images, but pixel values above 1.0 will be clipped.
   </p>
 
-<h3>Task 1: Generating Rays from Cameras (20 points)</h3>
+<h3>Task 1: Generating Rays from Cameras (20%)</h3>
 
 <p>Here in this task, you are going to generate rays by implementing two subclasses of the <code>Camera</code> class, including orthographic camera and perspective camera. </p>
 <p>You can find the functions to implement in  <code>OrthographicCamera.java</code> and <code>PerspectiveCamera.java</code>.
@@ -132,7 +249,7 @@ All of the properties you will need are stored in the <tt>Camera</tt> class.
 <p>You can then test your getRay() method for both of these classes by running the main method in Camera.java. You should get "Test successful" messages if your implementation is correct.
 
 
-<h3>Task 2: Intersecting Ray with Surfaces (30 points)</h3>
+<h3>Task 2: Intersecting Ray with Surfaces (30%)</h3>
 
 <p>Here in this task, you are going to implement the function <code>boolean intersect(IntersectionRecord outRecord, Ray rayIn)</code> in both <code>Sphere.java</code> and <code>Triangle.java</code>. 
 <p> This method intersects the given ray with the surface. Return true if the ray intersects the geometry 
@@ -161,7 +278,7 @@ coordinates of the hit point. Texture coordinates, if available, should be inter
 <p> To test your implementation, you can run <tt>SphereTests.java</tt> and <tt>TriangleTests.java</tt> in package <tt>ray1.tests</tt></p>
 <p> You will be able to test your texture coords using the scene files in textured_scenes folder after you had Task 5 implemented.</p>
 
-<h3>Task 3: Scene (10 points)</h3>
+<h3>Task 3: Scene (10%)</h3>
 
 <p>The <tt>Scene</tt> class stores information relating to the composition, 
 i.e. the camera, a list of surfaces, a list of lights, etc. It also contains a scene-file-specified <tt>exposure</tt> field, which can be used to adjust the brightness of the resulting image. You need to implement the following method: 
@@ -180,7 +297,7 @@ i.e. the camera, a list of surfaces, a list of lights, etc. It also contains a s
 
   <p> To test your implementation, you can run <tt>Scene.java</tt> in package <tt>ray1.tests</tt>
 
-<h3>Task 4: Ray Tracing (10 points)</h3>
+<h3>Task 4: Ray Tracing (10%)</h3>
 
 <p>You then need to complete the <code>shadeRay</code> method of the <code>RayTracer</code> class. 
   This method contains the main logic of the ray tracer. It takes a ray generated by the camera, intersects it with the scene, 
@@ -195,7 +312,7 @@ i.e. the camera, a list of surfaces, a list of lights, etc. It also contains a s
   See Appendix A for details on rendering scenes.
 
 
-<h3>Task 5: Shading (30 points)</h3>
+<h3>Task 5: Shading (30%)</h3>
 
 <p> Here in this task, you are computing the value returned from a ray. We ask you to implement the Lambertian and Phong shading models, with mirror reflections. 
   You can find the method to be filled in <code>PhongBRDF.java</code>, <code>LambertianBRDF.java</code> and <code>ReflectionShader.java</code></p>
@@ -530,3 +647,5 @@ Include a readme in your zip that contains:
   <li>Anything else you want us to know.
 </ul>
 <p><strong><a href=https://cms.csuglab.cornell.edu>Upload here (CMS)</a></strong>
+
+
