@@ -14,46 +14,8 @@
     <li>Write the matrix for a CW rotation by 60 degrees around the point (1,1).  Verify it by transforming the points (1,0), (2,0), and (1,1) to ensure they go to the right places.
     <li>Compute the composition of these two rotations in the two possible orders.  Describe the resulting transformations in words (e.g. as a rotation about a point, a translation, etc.).
 </ol>
- <h4> Q2. Perspective Projection</h4>
-<p> The orthographic projection matrix given in lecture and in the book is:
- \[M_o = \begin{bmatrix}2/(r-l) & 0 & 0 & -(r+l)/(r-l) \\ 0 & 2/(t-b) & 0 & -(t+b)/(t-b) \\ 0 & 0 & 2/(n-f) & -(n+f)/(n-f) \\ 0 & 0 & 0 & 1\end{bmatrix}\]
- where \(l\), \(r\), \(b\), \(t\), \(n\), and \(f\) specify the left, right, bottom, top, near, and far bounds of the view.  The inverse of this matrix is:
- \[ M_o^{-1} =  \begin{bmatrix}(r-l)/2 & 0 & 0 & (l+r)/2 \\ 0 & (t-b)/2 & 0 & (b+t)/2 \\ 0 & 0 & (n-f)/2 & (f+n)/2 \\ 0 & 0 & 0 & 1 \end{bmatrix}\]
- The perspective matrix is:
- \[ P = \begin{bmatrix}n & 0 & 0 & 0 \\ 0 & n & 0 & 0 \\ 0 & 0 & n+f & -fn \\ 0 & 0 & 1 & 0 \end{bmatrix} \]
- And its inverse transformation is:
- \[ P^\text{inv} = \begin{bmatrix} f & 0 & 0 & 0 \\ 0 & f & 0 & 0 \\ 0 & 0 & 0 & fn \\ 0 & 0 & -1 & f+n \end{bmatrix}\]
- (Note that this is not precisely the inverse of the matrix \(P\); it has been re-scaled to make it neater without changing the projective transformation that it defines.)</p>
-<ol type="a">
-<li> Multiply these matrices to compute the perspective projection matrix, \(M_p\), and a matrix \(M_p^\text{inv}\) for the inverse of the perspective projection.  Your answer will still be in terms of the view parameters \(l\), \(r\), \(b\), \(t\), \(n\), and \(f\).  For a perspective view, recall that the near and far coordinates are both negative (since they are the coordinates of planes that are in front of the camera), and the left, right, bottom, and top coordinates are the bounds of the view volume as measured on the near plane (\(z = n\)).
-</li>
-</ol>
- <p>Just to recall some terminology: each of these projection transformations (represented by the matrices \(M_o\) and \(M_p\)) takes points in <i>eye space</i> (aka. camera space) and maps them to <i>normalized device coordinates</i> (aka NDC).</p>
-<ol type="a" start=2>
-<li> Verify your answer to (a):<br>
-    <ol type="i">
-        <li> Compute the projection and inverse projection matrices for \(l = -3\), \(r = +3\), \(b = -2\), \(t = +2\), \(n = -1\), \(f = -5\).</li>
-        <li> Transform the 3D eye-space point \((3, 2, -3)\), which is inside the view volume, to a 3D point in NDC, and confirm it lands inside the canonical view volume.</li>
-        <li> Transform the point from (ii) back into eye space and confirm it lands in the same place where it started.</li>
-    </ol>
-</li>
-</ol>
-<p>In NDC space, the eight corners of the canonical view volume are \(c_\text{lbf}, c_\text{rbf}, \ldots, c_\text{rtn} = (\pm 1, \pm 1, \pm 1)\).  The view volume in eye space consists of all the points that map into the canonical view volume under the projection transformation.</p>
-<ol type="a" start=3>
-<li>Use the inverse projection matrices to compute the eight 3D points that are the corners of the eye-space view volumes for the perspective and orthographic cases. Your answer will be in terms of the view parameters \(l\), \(r\), \(b\), \(t\), \(n\), and \(f\).  Check your answer by verifying that the 3D corner points you found for each volume transform to the correct corners of the canonical view volume.  [If you have not managed to automate the computations, just hand in 3 of the 8 corners for each case, 2 on the near plane and 1 on the far plane.]
-</li>
-</ol>
-<p>In homogeneous coordinates, in which the 3D point 
-    \((x,y,z)\) is written as the 4D vector \(p = (x,y,z,1)\), the plane \(\{(x, y, z) \,|\, ax + by + cz + d = 0\}\) can be written compactly using the 4D vector \(q = (a,b,c,d)\).  The plane equation is then 
-    \(\{p \,|\, p \cdot q = 0\}\), which makes it easy to check whether a point \(p\) is on a plane \(q\).  Just as the 4D vector describing a 3D point is only unique up to a scale factor, the 4D vector describing a plane is only unique up to a scale factor.</p>
-<ol type="a" start=4>
-<li> Write the 4D vectors corresponding to the six planes \(P_l, P_r, P_b, P_t, P_f, P_n\) that contain the left, right, bottom, top, far, and near faces of the canonical view volume, in NDC.
-</li>
-<li> Find the 4D vectors of the 6 planes that bound the eye-space perspective view volume.  You can do this by inspection, from the corners of the view volume that you worked out earlier, or if you want a niftier way, by transforming the six planes from the previous part through the inverse projection matrix (planes in homogeneous coordinates transform in exactly the same way as normal vectors do in ordinary 3D transformations).  Remember these vectors are only defined up to a scale factor, so you may like to scale them to the neatest, simplest, most understandable form.  [If you have not managed to automate the computations, only hand in the front, left, and top planes.]
-<li>Verify that each of the 8 corners of the volume is indeed on each of the 3 planes it should be, and that the left, right, bottom, and top planes all also contain the origin (aka. the eye position).  If you want, see if you can do this part using a single matrix multiplication.  [If you have not managed to automate the computations, only hand in the checks for the front, left, and top planes and three corner points of your choice.]
-</li>
-</ol>
-<h4>Q3. Manipulator Warmup</h4>
+ 
+<h4>Q2. Manipulator Warmup</h4>
 <p> Manipulators are 3D user interface elements that allow the user to edit the transformation of an object. In this question, we will consider a translation manipulator. A translation manipulator can be thought of as a ray in three-dimensional space that corresponds to an object space axis (either x, y, or z) for a given object. One challenge with implementing manipulators to map the user's action (in a 2-D image plane) to a 3-D transformation. We are given the coordinates and direction of the manipulator and two click locations on screen, and the question is: what translation should be applied to the object?</p>
  <p> Consider a manipulator as a ray with origin \(\mathbf{o}\) and direction \(\mathbf{d}\). Any point \(\mathbf{p}\) on that ray can be described by a parameter t: \(\mathbf{p} = \mathbf{o} + t\mathbf{d}\). For a translation manipulator, the goal is to find the positions on the ray that the user clicked (\(t_1\) being the first click point, and \(t_2\) being the second). Once we've determined the best \(t_1\) and \(t_2\), we can then apply a translation transformation on the object in the object's frame along the manipulator's axis by the amount \(t_2-t_1\).</p>
  <h5>Parameters</h5>
@@ -84,4 +46,4 @@ What are the coordinates of the two points in question?
 <li> Finally, what is the matrix we would apply to translate the object appropriately in its own coordinate space?
 </ol>
  <h4>What to Submit</h4>
-<p>Submit a PDF file containing Q1 Q2 and Q3 together on CMS.
+<p>Submit a PDF file containing Q1 and Q2 together on CMS.
