@@ -1,0 +1,58 @@
+<!-- <h1><strong>PA 3: Scene</strong></h1> -->
+<script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+ </script>
+ <p><strong>Do this project alone or in groups of two, as you prefer. </strong>You can use <a href="https://piazza.com/cornell/fall2019/cs46205620/home">Piazza</a> to help pair yourselves up.
+    <h3><strong>Due: Friday October 25th 2019 (11:59pm)</strong></h3>
+    <p>The written and programming components are closely related in this assignment, and you'll hand in both parts together in a single handin.  Do the written part first, though, since in the process you will be deriving the expressions you need to implement in your program.</p>
+
+     <h3>Written Part</h3>
+    <p>Note: You should feel free to use a symbolic algebra package, such as <a href="http://www.wolframalpha.com/examples/mathematics/linear-algebra/">Wolfram Alpha</a> (easiest to get started with, not so easy to automate), <a href="https://sandbox.open.wolframcloud.com">Wolfram Cloud</a> (access to the underlying language for Alpha, offered in freemium model), or <a href="https://live.sympy.org">SymPy</a> (open source system with many of the capabilities of Wolfram Cloud), and/or numerical math tools like a scientific calculator or Matlab/NumPy/Julia etc., to help with these problems.
+</p>
+    <!-- <hr/> -->
+     <h4>Q1. Transformation matrices</h4>
+ <ol type="a">
+    <li>Write the matrix for a CCW rotation by 60 degrees around the origin.  Verify it by transforming the points (0,0), (1,0), and (0,1) to ensure they go to the right places.
+    <li>Write the matrix for a CW rotation by 60 degrees around the point (1,1).  Verify it by transforming the points (1,0), (2,0), and (1,1) to ensure they go to the right places.
+    <li>Compute the composition of these two rotations in the two possible orders.  Describe the resulting transformations in words (e.g. as a rotation about a point, a translation, etc.).
+</ol>
+ 
+<h4>Q2. Manipulator Warmup</h4>
+<p> Manipulators are 3D user interface elements that allow the user to edit the transformation of an object. In this question, we will consider a translation manipulator. A translation manipulator can be thought of as a ray in three-dimensional space that corresponds to an object space axis (either x, y, or z) for a given object. One of the challenges with implementing manipulators is mapping the user's action (in a 2D image plane) to a 3D transformation. We are given the coordinates and direction of the manipulator, in 3D, and two mouse locations on the screen (where the mouse cursor was, and where it is now), and the question is: what 3D translation should be applied to the object to make the object move across the screen in the same way the mouse did?</p>
+ <p> Consider a manipulator as a parametric line (similar to a ray in ray tracing) with origin \(\mathbf{o}\) and direction \(\mathbf{d}\). Any point \(\mathbf{p}\) on that axis can be described by a parameter \(t\): \(\mathbf{p} = \mathbf{o} + t\mathbf{d}\). For a translation manipulator, the goal is to find the positions on the axis that the mouse pointed to (\(t_1\) being the first mouse position, and \(t_2\) being the second). Once we've determined the best \(t_1\) and \(t_2\), we can then apply a translation transformation to the object, in the object's local frame, in the direction of the manipulator's axis, by the amount \(t_2-t_1\).</p>
+ <h5>Parameters</h5>
+ <p>In this written assignment you'll work out the translation amount for a particular camera and pair of mouse positions.  But in the process you should think about the general form of the computation you are doing, since in the programming part you will need to implement the same computation for arbitrary cameras and mouse positions.  For this written assignment:</p>
+<ul>
+<li> The camera is at the origin in world space, pointing in the negative \(z\) direction, the \(y\) axis is up.  (That is, the view transformation, aka. camera transformation, is the identity.)
+<li> The image plane is a square in the \(z=-3\) plane with side length 6 centered at \((0,0,-3)\).  (That is, the camera's near distance is 3 and its field of view is 90 degrees in both \(x\) and \(y\).)
+<li> The translation manipulator's origin is currently located at \((3,2,-8)\) in world space.
+<li> The translation manipulator corresponds to the object-space \(x\) axis, and in world space it is currently pointing in the direction \((2,1,-0.5)\).  Note that you should normalize this direction vector so that your final parameter values match ours.
+<li> The old and new mouse positions are at the points \(\mathbf{c}_1 = (2.5,1,-3)\) and \(\mathbf{c}_2 = (-1.5,0,-3)\) on the image plane.  (That is, the mouse positions in the OpenGL viewport, when mapped onto the image plane, end up at these locations.)
+</ul>
+<p>
+ Here are some reference images that might be useful for you to visualize the process of determining \(t_1\) and \(t_2\).</p>
+ <div class="thumbnails" style="text-align: center">
+    <img src="images/a3/rayGenerate.png" alt="Ray Generation">
+    <img src="images/a3/pointProject.png" alt="Point Projection">
+</div>
+ <h5>Questions</h5>
+<ol>
+<li> Our first job is to describe the rays outgoing from the eye intersecting the image plane at the two mouse positions. What are the equations of the two rays in question?
+<li> Next, we need to find the world coordinates of the points where these rays intersect a plane defined by the translation manipulator's origin and direction. A point and a direction, however, aren't enough to determine a plane&mdash;we need an additional constraint. We want the plane to contain:
+<ol>
+<li>the manipulator's origin</li>
+<li>the manipulator's direction</li>
+<li>a vector perpendicular to the manipulator's axis and parallel to the image plane </li>
+</ol>
+What are the coordinates of these plane intersection points for the two rays?
+<li> Now we need to find the points on the manipulator axis that are closest to these points. Keeping in mind that points on the manipulator axis can be completely described by their associated \(t\) parameters, what are \(t_1\) and \(t_2\)?
+<li> Finally, what is the matrix we would apply to translate the object appropriately in object space?
+</ol>
+ <h4>What to Submit</h4>
+<p>Submit a PDF file containing Q1 and Q2 together on CMS.
+
+<h3>Coding Part</h3>
+<p>Coming soon&hellip;</p>
+ <h4>What to Submit</h4>
+<p>Submit a Zip file containing your code on CMS.
+
