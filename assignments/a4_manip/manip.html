@@ -2,22 +2,28 @@
 <script type="text/javascript" async
         src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
  </script>
- <p><strong>Do this project alone or in groups of two, as you prefer. </strong>You can use <a href="https://piazza.com/cornell/fall2019/cs46205620/home">Piazza</a> to help pair yourselves up.
-    <h3><strong>Due: Friday October 25th 2019 (11:59pm)</strong></h3>
+ <p><strong>Do this project alone or in groups of two, as you prefer. 
+     
+ </strong>You can use <a href="https://piazza.com/cornell/fall2019/cs46205620/home">Piazza</a> to help pair yourselves up.
     <p>The written and programming components are closely related in this assignment, and you'll hand in both parts together in a single handin.  Do the written part first, though, since in the process you will be deriving the expressions you need to implement in your program.</p>
 
-     <h3>Written Part</h3>
-    <p>Note: You should feel free to use a symbolic algebra package, such as <a href="http://www.wolframalpha.com/examples/mathematics/linear-algebra/">Wolfram Alpha</a> (easiest to get started with, not so easy to automate), <a href="https://sandbox.open.wolframcloud.com">Wolfram Cloud</a> (access to the underlying language for Alpha, offered in freemium model), or <a href="https://live.sympy.org">SymPy</a> (open source system with many of the capabilities of Wolfram Cloud), and/or numerical math tools like a scientific calculator or Matlab/NumPy/Julia etc., to help with these problems.
+<h4><strong>A. Written Assignment</strong></h4>
+<p>
+<strong>Due: Friday, Oct 25 2019 (11:59pm)</strong> <br>
+<strong>Points:</strong> 20 <br>
+<strong>Submission:</strong> a PDF file upload <br>
+
+<p>Note: You should feel free to use a symbolic algebra package, such as <a href="http://www.wolframalpha.com/examples/mathematics/linear-algebra/">Wolfram Alpha</a> (easiest to get started with, not so easy to automate), <a href="https://sandbox.open.wolframcloud.com">Wolfram Cloud</a> (access to the underlying language for Alpha, offered in freemium model), or <a href="https://live.sympy.org">SymPy</a> (open source system with many of the capabilities of Wolfram Cloud), and/or numerical math tools like a scientific calculator or Matlab/NumPy/Julia etc., to help with these problems.
 </p>
     <!-- <hr/> -->
-     <h4>Q1. Transformation matrices</h4>
+<h3>Q1. Transformation matrices</h3>
  <ol type="a">
     <li>Write the matrix for a CCW rotation by 60 degrees around the origin.  Verify it by transforming the points (0,0), (1,0), and (0,1) to ensure they go to the right places.
     <li>Write the matrix for a CW rotation by 60 degrees around the point (1,1).  Verify it by transforming the points (1,0), (2,0), and (1,1) to ensure they go to the right places.
     <li>Compute the composition of these two rotations in the two possible orders.  Describe the resulting transformations in words (e.g. as a rotation about a point, a translation, etc.).
 </ol>
  
-<h4>Q2. Manipulator Warmup</h4>
+<h3>Q2. Manipulator Warmup</h3>
 <p> Manipulators are 3D user interface elements that allow the user to edit the transformation of an object. In this question, we will consider a translation manipulator. A translation manipulator can be thought of as a ray in three-dimensional space that corresponds to an object space axis (either x, y, or z) for a given object. One of the challenges with implementing manipulators is mapping the user's action (in a 2D image plane) to a 3D transformation. We are given the coordinates and direction of the manipulator, in 3D, and two mouse locations on the screen (where the mouse cursor was, and where it is now), and the question is: what 3D translation should be applied to the object to make the object move across the screen in the same way the mouse did?</p>
  <p> Consider a manipulator as a parametric line (similar to a ray in ray tracing) with origin \(\mathbf{o}\) and direction \(\mathbf{d}\). Any point \(\mathbf{p}\) on that axis can be described by a parameter \(t\): \(\mathbf{p} = \mathbf{o} + t\mathbf{d}\). For a translation manipulator, the goal is to find the positions on the axis that the mouse pointed to (\(t_1\) being the first mouse position, and \(t_2\) being the second). Once we've determined the best \(t_1\) and \(t_2\), we can then apply a translation transformation to the object, in the object's local frame, in the direction of the manipulator's axis, by the amount \(t_2-t_1\).</p>
  <h5>Parameters</h5>
@@ -51,8 +57,82 @@ What are the coordinates of these plane intersection points for the two rays?
  <h4>What to Submit</h4>
 <p>Submit a PDF file containing Q1 and Q2 together on CMS.
 
-<h3>Coding Part</h3>
-<p>Coming soon&hellip;</p>
- <h4>What to Submit</h4>
-<p>Submit a Zip file containing your code on CMS.
+<h4><strong>B. Programming Assignment</strong></h4>
+<p>
+<strong>Due: Friday, Oct 25 2019 (11:59pm)</strong> <br>
+<strong>Points:</strong> 80 <br>
+<strong>Submission:</strong> a ZIP file upload <br>
+<strong>This assignment comes with multiple subtasks, Please make sure to start early.</strong>
+
+<h3>1.Introduction</h3>
+ <p> For the programming part of this assignment, you will implement a 3D user interface of a type commonly provided in 3D modeling tools, which we call manipulators.  A 3D UI element is one that appears in a 3D scene, and like 2D UI elements such as scroll bars and sliders, it responds to a user's mouse input to adjust a property of the scene the user wants to control.  In particular, manipulators are 3D UI elements that are used to edit the transformations that position objects in a scene.</p>
+ <p> Manipulators are designed to follow the UI design principle of direct manipulation; if you want to translate or rotate an object, you do so by grabbing it with the mouse and pulling in the direction you want it to go.  Because transformations have a lot of degrees of freedom (ours has 9), manipulators let the user edit one part of the transformation at a time, constraining the motion so that 2D mouse input suffices to define how the object moves.  Our manipulators are all single-axis manipulators, editing translation or scale along a single axis, or a single fixed-axis rotation, at a time.
+ <p> In our framework, the user chooses a manipulation mode using the keyboard: T for translation, R for rotation, S for scaling, and the appropriate manipulator&mdash;or more precisely, a trio of manipulators, one for X, one for Y, and one for Z&mdash;appears.  The user uses a manipulator by clicking on it, to indicate that he or she wishes to edit the object's transformation on that particular axis. We modify the transformations by applying axis-aligned rotations, translations, or scales to them, and the goal of a manipulator is (a) to give a visual indication of what will happen when you apply one of these transforms and (b) to give a direct "handle" to pull on to indicate the direction and size of the transformation.
+ <p> In this framework, an object to be manipulated (that is, a mesh specified by a user) has several \(4\times 4\) matrices that compose together to specify the transformation from a point on the object in that object's local space to the same point in world space. These matrices are separated into a translation matrix \(T\), 3 rotation matrices \(R_x\), \(R_y\), and \(R_z\) (one for rotations around each axis), and a scale matrix \(S\). The order in which these matrices are multiplied is important (remember that in general, transformation matrices do not commute!). For this assignment, the order is \(TR_xR_yR_zS\); that is, when computing the world space location of a point on the mesh, scaling is applied first, then rotations (\(Z\), then \(Y\), then \(X\)), and then translations are applied last. These matrices will be multiplied together to form the model matrix, but keeping the components separated like this allows them to be modified more easily.
+<h3>2.Setup</h3>
+ <p> A new commit has been pushed to the <a href="https://github.com/smarschner/frameworks_cs4620fa19">frameworks_cs4620fa19 repository</a>.
+    The framework for this assignment is under the <tt>manip</tt> directory.
+ <p> This assignment uses OpenGL to display and update 3D graphics in real-time. In order to take advantage of OpenGL from within Java, we use the <a href="https://www.lwjgl.org/">LWJGL library</a>, which provides bindings to OpenGL. It also provides bindings to <a href="http://www.glfw.org/">GLFW</a>, which is a framework for managing application windows. These libraries are included in the <tt>lib</tt> directory under the <tt>a3</tt> directory; you'll need to link to them to run the program. If you're using Eclipse, select Project > Properties. In the menu on the left, click "Java Build Path", and then click "Add JARs...". Navigate to the <tt>lib</tt> directory within the project, and select <tt>lwjgl.jar</tt>, <tt>lwjgl-opengl.jar</tt>, and <tt>lwjgl-glfw.jar</tt>. In addition, select any JAR files that contain the word "natives" followed by the name of your operating system.
+ <p> <strong>IMPORTANT NOTE FOR MAC USERS:</strong> In order to use GLFW in Java, you need to tell Java to run your program on the first thread that is spawned when you run your program. To do this, select Run > Run Configurations. In the Arguments tab, under VM arguments, add the option &ldquo;<tt>-XstartOnFirstThread</tt>&rdquo;.
+ 
+    <h3>3.Specification</h3>
+ <p> The code in the framework handles displaying objects, drawing the manipulators, and detecting when the user has clicked on a manipulator. Manipulators are specified by extending the abstract <code>Manipulator</code> class; concrete child classes must implement the method called <code>applyTransformation</code>. Each manipulator has a member variable called <code>axis</code> (an enum that is either <tt>X</tt>, <tt>Y</tt>, or <tt>Z</tt>), and a member variable called <code>reference</code> that keeps track of the object being manipulated. When the user clicks on a manipulator and drags, the framework code calls <code>applyTransformation</code> to compute and apply the transformation on the referenced object's matrix stack. For instance, in translation mode, if the user clicks on the red (X axis) arrow and drags the mouse, the method <code>applyTransformation</code> will be called on the <code>TranslationManipulator</code> with <code>axis==X</code>. This method will then update <code>reference.translation</code>, which is a <code>Matrix4</code> that contains the translation portion of the object's current transformation. The input to this function includes the previous and current mouse positions, as well as the camera's current view projection matrix. Your task is to implement <code>applyTransformation</code> for <code>TranslationManipulator</code>, <code>ScaleManipulator</code>, and <code>RotationManipulator</code>.
+ <p> The first step in implementing manipulators is to get the correct transformations, not worrying yet about the size of the transformations. For this, you just need to make a transformation of the right type, along the given axis, with a magnitude that is computed from the mouse delta in some easy way: for instance, translate by the difference in mouse x coordinate times 0.01 (the details don't matter since this is just temporary). Once this works, you will see the object moving in the direction of the manipulator arrow you clicked on, but it will generally be confusing to figure out which way to move the mouse to get the desired result.
+ <p> The last and final step is to make the manipulations "follow the mouse". This means that if you click on the manipulator and move the mouse, the point you clicked on should remain exactly under the mouse pointer as you drag. The strategy we recommend is to express the ray corresponding to the user's click and the line corresponding to the manipulation axis both in world space, then use the warmup problem to compute the \(t\) values along the axis that correspond to the user's mouse movement. Once you have these values you know how much to translate: it is by the difference of the two \(t\) values. Once this works, if you click on points that are on the manipulation axis and drag exactly along the axis, the object will exactly follow the mouse.
+ <h3>Task 1: Translation Manipulator (30%)</h3>
+ <p> The translation manipulator, which you considered already in one of the written questions, displays three arrows that represent the \(X\), \(Y\), or \(Z\)
+axes in global coordinates. If the user clicks and drags along an axis,
+the resulting translation should exactly follow the mouse (even if other transformations are applied first!).
+When the drag is not parallel to the selected axis, the translation should follow the mouse as much as possible (hence your projection scheme you worked with in the written questions).
+ <p> The translation manipulator is the most complicated manipulator of the three, particularly if it is the first one you're implementing, but you've already had some experience dealing with it in the written questions. As before, the idea is that the matrix you construct must be a translation of \(t_2-t_1\) along the specified axis.
+ <p> Note that when the mouse ray and manipulator axis are nearly parallel, you may observe some strange behavior. Small movements of the mouse may result in significant transformations. This is expected and unavoidable. In real-world applications, manipulators are typically disabled if the axis is close to parallel with the mouse ray.
+ <h3>Task 2: Scale Manipulator (30%)</h3>
+ <p> The scaling manipulator shows the three scaling axes by drawing three lines with small boxes at the ends. This manipulator is very, very similar to the translation manipulator (in fact, until you construct your final matrix, finding the appropriate \(t_1\) and \(t_2\) are nearly identical, and as such you might find it useful to break up this functionality into its own method that is available to both classes). The magnitude of your scale, however, should be based on a ratio of \(t_1\) and \(t_2\), rather than a difference. Here, you should scale by \(t_2/t_1\) in the appropriate direction. Furthermore, scaling happens before any other transformation in the matrix stack, meaning all scale operations happen in the object's local coordinate frame.
+ <h3>Task 3: Rotation Manipulator (40%)</h3>
+ <p> The rotation manipulator displays three circles on a sphere surrounding the origin
+of the object's coordinates. Each circle is perpendicular to one of the rotation axes,
+and clicking on that circle and dragging performs a rotation around that axis. Again, you'll want
+the rotation to follow the mouse as it drags across the screen.</p>
+ <p> The rotation manipulator is slightly different than the previous two; rather than modifying
+the referenced object along a specific axis, each rotation manipulator rotates the object in
+the plane which is perpendicular to the given axis. For instance, the \(X\)-axis rotation manipulator
+rotates the object in the \(YZ\)-plane.</p>
+ <p> To implement this manipulator, trace mouse rays into the scene for the current and last
+mouse positions, and intersect them with the plane defined by the manipulator's origin and
+axis (transformed according to their position in the matrix stack). If one or both of the rays
+is parallel to the plane, then don't apply any transformation to the object. Otherwise, calculate
+the vectors from the manipulator origin to each intersection point. Find the <i>signed</i> angle
+from the previous mouse position to the current mouse position along the plane, and rotate the
+referenced object around the appropriate axis by that angle. Note that you can use the plane's
+normal (i.e., the manipulator axis) to find out if the angle is positive or negative. </p>
+ <p> These manipulators behave like a set of gimbals; that is, rotating with one manipulator
+updates the world-space axis of other rotation manipulators further down the stack. For example,
+rotating the \(X\) rotation manipulator also rotates the \(Y\) and \(Z\) rotation manipulators;
+rotating the \(Y\) rotation manipulator updates the \(Z\) manipulator, but NOT the \(X\) manipulator.
+The scaling manipulators will be affected by all three rotations.
+ <div class="thumbnails" style="text-align: center">
+    <img src="images/a3/rotation-manipulator.png" alt="Rotation Manipulator">
+</div>
+ <h3>4.The Complete Program</h3>
+ <p>The program's <tt>main</tt> method is found in <tt>Main.java</tt>, within the <tt>main</tt> package. The program has a single command line argument, which is the path to an OBJ mesh (try <tt>data/meshes/teapot.obj</tt>).
+ <h5>Control Guide</h5>
+<ul>
+<li> Left click and drag to orbit the camera.
+<li> Right click and drag to move the camera in the view plane.
+<li> Scroll to zoom the camera.
+<li> Press 'T' to display the translation manipulators.
+<li> Press 'S' to display the scale manipulators.
+<li> Press 'R' to display the rotation manipulators.
+<li> Pres 'esc' to exit.
+</ul>
+
+ <h3>5.What to Submit</h3>
+<p>Submit a zip file containing your solution organized the same way as the code on Github.
+Include a README in your zip that contains:
+<ul>
+  <li>You and your partner's names and NetIDs.
+  <li>Any problems with your solution.
+  <li>Anything else you want us to know.
+</ul>
+<p><strong><a href=https://cmsx.cs.cornell.edu>Upload here (CMS)</a></strong>
 
