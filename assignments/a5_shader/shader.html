@@ -7,11 +7,7 @@
 <p><strong>Do this project alone or in groups of two, as you prefer. </strong>You can use <a href="https://piazza.com/class/jd0ealxkqom6s8">Piazza</a> to help pair yourselves up.
 
     <h3>Programming Assignment</h3>
-<p>
-<strong>Due: Friday, November 8 2019 (11:59pm)</strong> <br>
-<strong>Points:</strong> 80 <br>
-<strong>Submission:</strong> a ZIP file upload <br>
-<strong>This assignment comes with multiple subtasks, Please make sure to start early.</strong>
+    <h4><strong>Due: Friday November 8th 2019 (11:59pm)</strong></h4>
 
     <h4>Overview</h4>
 
@@ -27,7 +23,7 @@
 
     <p>Each part is contained in its own webpage, which includes a framework based on the mesh viewer you saw in Assignment 1 (Mesh). This will allow you to load any meshes and textures you might like to test with. All of the work outside of the shaders themselves has been done for you, but be sure to understand what uniforms and attributes are being passed to your GLSL program. Some of the uniforms may be controlled using a slider on the webpage.
 
-    <p>The shaders are embedded in the HTML documents themselves. You will edit and submit these directly. We have marked all the shaders you need to write with <tt>// TODO#A4</tt> in the source code. You can find the code framework in the <a href="https://github.com/smarschner/frameworks_cs4620fa19/tree/master/shaders">Github repository</a>.
+    <p>The shaders are embedded in the HTML documents themselves. You will edit and submit these directly. We have marked all the shaders you need to write with <tt>// TODO#A4</tt> in the source code.
 
     <p>A few test meshes and textures have been provided in the <tt>data</tt> directory.
 
@@ -163,7 +159,7 @@ Once the server is running, visit <a href=http://localhost:8000/environment.html
 
 <p>Creating detailed models with thousands of polygons is a time consuming job and rendering them in real-time can be also problematic. However, with normal mapping, we can make simple, low resolution models look like highly detailed ones. In addition to the polygon model, we provide a high resolution normal map which we can use in the fragment shader instead of the interpolated normals, adding detail to the low resolution model. Normal maps can be generated procedurally in the shaders or read from an image and used as a texture.
 
-<p>Your task is to implement normal mapping in <tt>normal.html</tt>. You will start with the Phong shader (or, if you prefer, Microfacet), but instead of using the mesh's (interpolated) normal, you will need to use a weighted combination of the normal and two tangent vectors. These are provided to the vertex shader as attributes: <tt>normal</tt> (as before), <tt>tangent</tt>, and <tt>tangent2</tt>. These three vectors form an orthonormal basis, where <tt>tangent</tt> is perpendicular to the <tt>normal</tt> direction and points towards the increasing \(u\) direction of the UV coordinates, and <tt>normal2</tt> completes the basis by being perpendicular to the other two. In addition we have provided a <tt>bumpiness</tt> uniform as a crude way of scaling the "strength" of the normal map. All-in-all, the resulting normal should be proportional to the sum of the following:
+<p>Your task is to implement normal mapping in <tt>normal.html</tt>. You will start with the Phong shader (or, if you prefer, Microfacet), but instead of using the mesh's (interpolated) normal, you will need to use a weighted combination of the normal and two tangent vectors. These are provided to the vertex shader as attributes: <tt>normal</tt> (as before), <tt>tangent</tt>, and <tt>tangent2</tt>. These three vectors form an orthonormal basis under the right handed coordinate system, where <tt>tangent</tt> is perpendicular to the <tt>normal</tt> direction and points towards the increasing \(u\) direction of the UV coordinates, and <tt>normal2</tt> completes the basis by being perpendicular to the other two. In addition we have provided a <tt>bumpiness</tt> uniform as a crude way of scaling the "strength" of the normal map. All-in-all, the resulting normal should be proportional to the sum of the following:
 
 <ul>
 <li><tt>tangent</tt> times (the red channel of the normal map texture - 0.5) times <tt>bumpiness</tt>.</li>
@@ -182,12 +178,19 @@ Once the server is running, visit <a href=http://localhost:8000/environment.html
 
 <h4>Problem 4: Displacement mapping</h4>
 
-<div class="thumbnails" style="text-align: center">
-    <img src="images/a4/displacement_reference_earth.jpg" alt="">
-    <img src="images/a4/displacement_reference_square.jpg" alt="">
+<div class="thumbnails row" style="text-align: center">
+  <div class="column">
+    <img src="images/a4/displacement_reference_earth.jpg" alt="" style="width:95%">
+  </div>
+  <div class="column">
+    <img src="images/a4/displacement_reference_square.jpg" alt="" style="width:95%">
+  </div>
+  <div class="column">
+    <img src="images/a4/displacement_reference_square_single_bump.jpg" alt="" style="width:95%">
+  </div>
 </div>
 
-<p>Building complex shapes in 3D is hard work, but one easy-to-use modeling tool that is good for adding detail to a smooth surface is displacement mapping.  The idea is to use a height function \(h(u,v)\) whose graph is a height field that shows the details you'd like, store it in an image, use texture coordinates to establish \((u,v)\) coordinates on the surface, and then displace each point of the surface along the surface normal at that point according to the height function.</p>
+<!-- <p>Building complex shapes in 3D is hard work, but one easy-to-use modeling tool that is good for adding detail to a smooth surface is displacement mapping.  The idea is to use a height function \(h(u,v)\) whose graph is a height field that shows the details you'd like, store it in an image, use texture coordinates to establish \((u,v)\) coordinates on the surface, and then displace each point of the surface along the surface normal at that point according to the height function.</p>
 
 <p>In equations, given a parametric surface defined by a function</p>
 
@@ -215,7 +218,7 @@ Once the server is running, visit <a href=http://localhost:8000/environment.html
 <p>For this problem you'll find all the work happens in the vertex shader (aside from the transformation of \(\mathbf{n}(u,v)\) to the object space); the fragment shader can remain entirely unchanged from the basic Phong shading implementation. Implement the shaders marked <tt>vertexShader</tt> and <tt>fragmentShader</tt> in <tt>displacement.html</tt>. In the vertex shader, you will need to compute the values for the following variables, and pass them to the fragment shader using <tt>varying</tt>s:</p>
 
 <ul>
-<li><tt>vPosition</tt>: Compute the displaced vertex position and transform it to the view space. Also store the projected point in <tt>gl_Position</tt>.</li>
+<li><tt>vPosition</tt>: Compute the displaced vertex position and transform it to the view space. Also store the projected point in <tt>gl_Position</tt></li>
 <li><tt>vNormal</tt>: Compute the normal at the vertex in view space, using the <tt>normal</tt> attribute.</li>
 <li><tt>vTangent</tt>: Compute the tangent in \(u\) direction in view space, using the <tt>tangent</tt> attribute.</li>
 <li><tt>vTangent2</tt>: Compute the tangent in \(v\) direction in view space, using the <tt>tangent2</tt> attribute.</li>
@@ -226,13 +229,62 @@ Once the server is running, visit <a href=http://localhost:8000/environment.html
 <ul>
 <li>Higher-resolution map of the Earth: mesh: <tt>data/meshes/sphere_highres.obj</tt>; texture: <tt>data/textures/earthmap1k.jpg</tt>; displacement map: <tt>data/textures/earthbump1k.jpg</tt>
 <li>Sine wave: mesh: <tt>data/meshes/square.obj</tt>; texture: none; displacement map: <tt>data/textures/sinbump1k.jpg</tt></li>
+</ul> -->
+<p>Building complex shapes in 3D is hard work, but one easy-to-use modeling tool that is good for adding detail to a smooth surface is displacement mapping.  The idea is to use a height function \(h(u,v)\) whose graph is a height field that shows the details you'd like, store it in an image, use texture coordinates to establish \((u,v)\) coordinates on the surface, and then displace each point of the surface along the surface normal at that point according to the height function.</p>
+
+<p>In equations, given a parametric surface defined by a function</p>
+
+\[p : \mathbb{R}^2 \rightarrow \mathbb{R}^3\]
+
+<p>We can define the displaced surface by, for any given \((u,v)\), moving the point \(p(u,v)\) along the normal according to \(h(u,v)\):</p>
+
+\[p_d(u,v) = p(u,v) + \alpha * h(u,v) * \hat{n}(u,v)\]
+
+
+<p>where \(\hat{n}\) is the unit normal vector to the surface at \(p(u,v)\) and \(\alpha\) is a scale factor used to control how strong a displacement to apply.  In this part of the assignment we will implement a vertex shader that displaces a surface defined by a triangle mesh according to this scheme.</p>
+
+<p>In a vertex shader it is simple to compute the displaced position of a vertex, since \(p(u,v)\) and \(\hat{n}(u,v)\) are given as vertex attributes, and \(h(u,v)\) can be obtained by a texture lookup.  However, as you'll gather from the first written problem in this assignment, displacing the surface also changes the normal to the surface, and this has a very important effect on shading.</p>
+
+<p>The derivation of the normal to a displaced surface in 3D is much like the curve in 2D from that earlier problem; it just has two partial derivatives instead of one.  To compute the normal to the surface defined by \(p\), we can compute two tangent vectors:</p>
+
+\[\frac{\partial p}{\partial u} (u,v) \qquad \text{and} \qquad \frac{\partial p}{\partial v} (u,v)\]
+
+<p>These are both perpendicular to the surface normal, so as long as they are not parallel (which would imply our surface is not really a surface) their cross product is the surface normal.  And if we can work out the tangents to the displaced surface, we can also compute the normal to the displaced surface.</p>
+
+<p>The derivatives of the surface defined by \(p_d\) are:</p>
+
+\[t_u(u,v) = \frac{\partial p_d}{\partial u} = \frac{\partial p}{\partial u} + \alpha \frac{\partial h}{\partial u} \hat{n} + \alpha h \frac{\partial \hat{n}}{\partial u}\]
+\[t_v(u,v) = \frac{\partial p_d}{\partial v} = \frac{\partial p}{\partial v}+ \alpha \frac{\partial h}{\partial v} \hat{n} + \alpha h \frac{\partial \hat{n}}{\partial v}\]
+
+
+<p>The derivative of \(\hat{n}\) (a quantity related to the curvature of the surface) is actually pretty complex to compute, but that's OK, because we'll assume that \(h\) is small and/or curvature is low as an excuse for discarding that last term, leaving us with:
+
+\[t_u(u,v) = \frac{\partial p}{\partial u} + \alpha \frac{\partial h}{\partial u} \hat{n}\]
+\[t_v(u,v) = \frac{\partial p}{\partial v} + \alpha \frac{\partial h}{\partial v} \hat{n}\]
+
+<p>and we can compute the displaced normal as</p>
+
+\[\hat{n}_d(u,v) = t_u(u,v) \times t_v(u,v)\]
+
+<p>In order to do this computation in a vertex shader, we need to have the (non-unit) tangents \(\frac{\partial p}{\partial u}\) and \(\frac{\partial p}{\partial v}\) available. You can't compute them in isolation at a vertex from the usual point, normal, and texture coordinates, because these derivatives are about how the position and texture coordinates change across the surface.  For this reason, these tangents need to be computed from the mesh and passed as vertex attributes, alongside the position, normal, and texture coordinates.</p>
+
+<p>In this assignment, the computation of the attributes <tt>derivU</tt> and <tt>derivV</tt> is handled by the framework (the code is in <tt>js/BufferGeometryUtils.js</tt>) by computing these tangents per-triangle and averaging them at vertices using the algorithm described <a href=http://www.terathon.com/code/tangent.html>here</a>.</p>
+
+<p>To calculate \(\frac{\partial h}{\partial u}\) and \(\frac{\partial h}{\partial v}\), you will need to approximate the partial derivatives of a texture. You can use a finite difference approximation to do so, which for the partial derivative with respect to \(u\) is:</p>
+
+\[\frac{\partial h(u,v)}{\partial u} = \frac{h(u+ \Delta u, v) - h(u - \Delta u, v)}{2 \Delta u}\]
+
+<p>where \(\Delta u\) is a small change in \(u\). It is important to choose a \(\Delta u\) that is small enough to capture local differences but large enough to sample the height at neighboring texels. A value of 0.001 for both \(\Delta u\) and \(\Delta v\) will work for the examples in this assignment.</p>
+
+<p>For this problem you'll find all the work happens in the vertex shader; the fragment shader can remain entirely unchanged from the basic Phong shading implementation. Implement the shaders marked <tt>vertexShader</tt> and <tt>fragmentShader</tt> in <tt>displacement-bump.html</tt>. In the vertex shader, compute the displaced vertex position and store it in <tt>gl_Position</tt>. Also compute the displaced unit normal to the displaced surface, and store it in <tt>vNormal</tt>.</p>
+
+
+
+<p>You can test your implementation on this model and height map:</p>
+<ul>
+<li>Higher-resolution map of the Earth: mesh: <tt>data/meshes/sphere_highres.obj</tt>; texture: <tt>data/textures/earthmap1k.jpg</tt>; displacement map: <tt>data/textures/earthbump1k.jpg</tt>
+<li>Sine wave: mesh: <tt>data/meshes/square.obj</tt>; texture: none; displacement map: <tt>data/textures/sinbump1k.jpg</tt></li>
+<li>Sine wave with a single bump: mesh: <tt>data/meshes/square.obj</tt>; texture: none; displacement map: <tt>data/textures/sinbumpSingle.jpg</tt></li>
 </ul>
 
- <h4>What to Submit</h4>
-<p>Submit a zip file containing your solution organized the same way as the code on Github.
-Include a README in your zip that contains:
-<ul>
-  <li>You and your partner's names and NetIDs.
-  <li>Any problems with your solution.
-  <li>Anything else you want us to know.
-</ul>
+
