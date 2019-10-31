@@ -7,11 +7,18 @@
 <p><strong>Do this project alone or in groups of two, as you prefer. </strong>You can use <a href="https://piazza.com/class/jd0ealxkqom6s8">Piazza</a> to help pair yourselves up.
 
     <h3>Programming Assignment</h3>
-    <h4><strong>Due: Friday November 8th 2019 (11:59pm)</strong></h4>
+<p>
+<strong>Due: Friday, November 8 2019 (11:59pm)</strong> <br>
+<strong>Points:</strong> 80 <br>
+<strong>Submission:</strong> a ZIP file upload <br>
+<strong>This assignment comes with multiple subtasks, Please make sure to start early.</strong>
 
     <h4>Overview</h4>
 
     <p>In this assignment, you will implement some shaders in GLSL, a graphics-specific language that lets you write programs that run on the graphics processor (GPU).
+
+    <p> A new commit has been pushed to the <a href="https://github.com/smarschner/frameworks_cs4620fa19">frameworks_cs4620fa19 repository</a>.
+    The framework for this assignment is under the <tt>shaders</tt> directory.
 
     There are four main components to the assignment:
     <ol>
@@ -276,7 +283,7 @@ Once the server is running, visit <a href=http://localhost:8000/environment.html
 
 <p>where \(\Delta u\) is a small change in \(u\). It is important to choose a \(\Delta u\) that is small enough to capture local differences but large enough to sample the height at neighboring texels. A value of 0.001 for both \(\Delta u\) and \(\Delta v\) will work for the examples in this assignment.</p>
 
-<p>For this problem you'll find all the work happens in the vertex shader; the fragment shader can remain entirely unchanged from the basic Phong shading implementation. Implement the shaders marked <tt>vertexShader</tt> and <tt>fragmentShader</tt> in <tt>displacement-bump.html</tt>. In the vertex shader, compute the displaced vertex position and store it in <tt>gl_Position</tt>. Also compute the displaced unit normal to the displaced surface, and store it in <tt>vNormal</tt>.</p>
+<p>For this problem you'll find all the work happens in the vertex shader; the fragment shader can remain entirely unchanged from the basic Phong shading implementation. Implement the shaders marked <tt>vertexShader</tt> and <tt>fragmentShader</tt> in <tt>displacement.html</tt>. In the vertex shader, compute the displaced vertex position and store it in <tt>gl_Position</tt>. Also compute the displaced unit normal to the displaced surface, and store it in <tt>vNormal</tt>.</p>
 
 
 
@@ -284,7 +291,20 @@ Once the server is running, visit <a href=http://localhost:8000/environment.html
 <ul>
 <li>Higher-resolution map of the Earth: mesh: <tt>data/meshes/sphere_highres.obj</tt>; texture: <tt>data/textures/earthmap1k.jpg</tt>; displacement map: <tt>data/textures/earthbump1k.jpg</tt>
 <li>Sine wave: mesh: <tt>data/meshes/square.obj</tt>; texture: none; displacement map: <tt>data/textures/sinbump1k.jpg</tt></li>
-<li>Sine wave with a single bump: mesh: <tt>data/meshes/square.obj</tt>; texture: none; displacement map: <tt>data/textures/sinbumpSingle.jpg</tt></li>
+<li>Sine wave with a single bump: mesh: <tt>data/meshes/square_small.obj</tt>; texture: none; displacement map: <tt>data/textures/sinbump1k.jpg</tt></li>
 </ul>
+
+ <h4>What to Submit</h4>
+<p>Submit a zip file containing your solution organized the same way as the code on Github.
+Include a README in your zip that contains:
+<ul>
+  <li>You and your partner's names and NetIDs.
+  <li>Any problems with your solution.
+  <li>Anything else you want us to know.
+</ul>
+<p><strong><a href=https://cmsx.cs.cornell.edu>Upload here (CMS)</a></strong>
+
+ <h4>General Note</h4>
+<p>For this assignment, you need to know the attributes and uniforms that THREE.js provides. All the vertex shaders have a commented section showing the variables defined in the THREE.js header that you should use in your solution.
 
 
