@@ -144,11 +144,6 @@ Similarly to a 2D texture, you can look up into a cube using the <tt>textureCube
 
 <p>Your task is to implement specular reflection under environment lighting. Given a viewing direction and a normal direction, we can compute the direction of a mirror reflection (see slides from class), and then use it to sample the cube map. You may assume the environment map is fixed in eye space; i.e. the mouse rotates the scene relative to the environment map, but the environment map remains fixed relative to the camera. Implement the <tt>vertexShader</tt> and <tt>fragmentShader</tt> in <tt>environment.html</tt>.
 
-<p>You can test your implementation on this model and normal map:</p>
-<ul>
-<li>Map of the Earth: mesh: <tt>data/meshes/sphere.obj</tt>; texture: <tt>data/textures/earthmap1k.jpg</tt>; normal map: <tt>data/textures/earthNormalMap_1k.png</tt>
-</ul>
-
 <p>
 Given the way this problem loads textures, you will likely need to run a server due to security restrictions. An easy way to do this is to install <a href=https://www.python.org>Python</a> if you do not already have it and run from your project directory the following command that corresponds to your Python version:
 <ul>
