@@ -45,8 +45,13 @@
 
 <h4>Problem 1: Microfacet Shader</h4>
 
-<div class="thumbnails" style="text-align: center">
-    <img src="images/a4/microfacet_reference.jpg" alt="">
+<div class="thumbnails row" style="text-align: center">
+  <div class="column" style="width:50%">
+    <img src="images/a4/microfacet_reference.png" alt="" style="width:95%">
+  </div>
+  <div class="column" style="width:50%">
+    <img src="images/a4/microfacet_reference_specular.png" alt="" style="width:95%">
+  </div>
 </div>
 
 <p>The Blinn-Phong shading implemented in the example shader gives OK results -- but it's far from the reality of light reflection. For more realistic appearance, we should use more sophisticated models based on the microfacet framework (like the one used in the Ray 1 extra credit).
@@ -122,6 +127,7 @@ These computations should be repeated for each visible light in the scene and th
 <ul>
 <li>Mesh: <tt>data/meshes/teapot.obj</tt>; texture: <tt>data/textures/Flower.png</tt>
 </ul>
+<p>The left image in the above uses the default alpha value, while the right image sets alpha to zero and achieves a very high specular reflection. The exposure is set to 15.0 in the <tt>microfacet.html</tt>.</p>
 
 
 <h4>Problem 2: Environment Mapping</h4>
