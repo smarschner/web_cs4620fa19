@@ -13,6 +13,8 @@
 <p class="duedate">Due:  Friday November 15 2019 (11:59pm)</p>
 <p><strong>Do this project alone or in groups of two, as you prefer. </strong>You can use <a href="https://piazza.com/cornell/fall2019/cs46205620/home">Piazza</a> to help pair yourselves up.
 
+<p>Note: You should feel free to use a symbolic algebra package, such as <a href="http://www.wolframalpha.com/examples/mathematics/linear-algebra/">Wolfram Alpha</a> and/or numerical math tools like Matlab/NumPy/Julia etc., to help with these problems.  These tools will also be useful for making plots.
+
 
 <h4>Q1. Quintic Modified B&eacute;ziers</h4>
 
@@ -30,7 +32,8 @@ hardly distinguish between <i>C<sup>2</sup></i> continuity and higher levels of 
 
     <li>Consider the cubic B&eacute;zier segment defined by the points at the corners of a 2-unit square: \((-1, -1)\), \((-1, 1)\), \((1, 1)\), and \((1, -1)\).  Use de Casteljau's algorithm (presented in class or in section 15.6 of the textbook) to divide this curve at the ratio of 4:6. In other words, a recurrence for computing points on B&eacute;zier spline: \(p_{0,i} = p_i\) and \(p_{n,i} = 0.4 p_{n-1,i} + 0.6 p_{n-1,i+1}\).
         <ol><li>What are the control points of the two sub-segments?
-            <li>What's the value of \(t\) evaluating in the left segment that produces the same point as evaluating the original segment at \(t=0.6\)? 
+            <li>What's the value of \(t\) evaluating in the left segment that produces the same point as evaluating the original segment at \(t=0.6\)?
+            <li>Evaluate the two segments using the matrix form of the equation to show that these two evaluations produce the same point.
         </ol>
     Two ways to do these evaluations are using the matrix form of the spline or following de Casteljau's algorithm.
 </ol>
@@ -61,8 +64,10 @@ And the degree of the spline is 5.
 </p>
 
 
+
 <h5>c) Basis functions</h5>
 Plot the blending (basis) functions of this quintic spline curve from \(t = 0\) to \(t = 1\) and include your plot in your response.
+
 
 
 
