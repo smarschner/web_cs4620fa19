@@ -1,0 +1,58 @@
+<script type="text/javascript" async
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+
+<h4>Introduction</h4>
+<p>
+    In this assignment, we will explore keyframe animation, one of the fundamental methods for creating motion in computer graphics.  The nomenclature of keyframe animation comes from the tradition of hand-drawn animation, in which a lead animator plans out a sequence (consisting of a succession of separate drawings photographed onto frames of film or video) by drawing a few important instants in the motion, known as the key frames or <i>keyframes</i>, and assistant animators known as in-betweeners complete the animation by drawing the frames that fill the time between the keyframes.  When done correctly this results in smooth motion that conforms to the poses and timing defined by the keyframes.</p>
+<p>
+    In keyframes for computer animation, properties of objects in a scene (especially including the transformations that define their positions) are specified for particular moments in time, and these properties are then interpolated across time to create continuous motion, which can be sampled at any desired rate to produce the frames of an animation.  The crucial operation needed to render keyframe animations is interpolation: for any particular point in time, the properties of each object are computed by finding the relevant keyframes (normally one or two before the current time and one or two after) and interpolating between the data stored at those frames.</p>
+<p>
+    You will write the core interpolation code for a simple system for animating 2D shapes arranged in a transformation hierarchy.  The only properties we animate are the transformations, expressed as 2D translations, rotations, and scales.
+</p>
+
+
+
+<h3>Programming Part</h3>
+<p class="duedate">Due: Friday December 6th 2019 (11:59pm)</p>
+<p><strong>Do this part alone or in groups of two, as you prefer.</strong>
+
+    <h3>The Framework</h3>
+
+    <p>
+        The framework for this assignment is a simple animation player that supports loading and playing animations of hierarchical 2D scenes.  Articulated figures are particularly common animation subjects, and we include a couple of simple puppet-like figures to use as examples.  Once loaded into the system, a model is a hierarchy of <tt>Shape</tt> objects, each with a rectangular image that defines its appearance and transformation parameters that describe its location in the scene.  The transformation parameters are:
+        <ol>
+            <li>Translation (a 2-vector)</li>
+            <li>Rotation (a scalar angle in degrees)</li>
+            <li>Scale (a 2-vector for scaling along x and y)</li>
+            <li>Pivot (a 2d point in local coordinates)</li>
+        </ol>
+    </p>
+    <p>
+        Because these are animatable parameters, they are stored not just as simple values, but as <tt>Timeline</tt> objects, each containing a default value (used as a constant when there are no keyframes) and a sequence of <tt>Keyframe</tt>s.  Each keyframe has a time (measured in 1/24-second frames) and a value for the parameter.  Timelines and keyframes are parameterized by the type of the interpolated parameter (<tt>Vector2</tt>, <tt>Double</tt>, etc.).
+    </p>
+    <p>
+        Since this is just an animation player, it has very simple controls like a video player: play/pause, single frame forward/back, and go to start/end.
+    </p>
+
+
+    <h3>Reference Videos</h3>
+    These videos show the output of our simulation playing the provided example videos.
+
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/xgJbMma4-FM" frameborder="0" allowfullscreen></iframe>
+
+
+    <h3>What to Submit</h3>
+
+    Submit a zip file containing:
+    <ol>
+        <li> Your solution organized the same way as the code on CMS. Please include your <tt>.classpath</tt> and <tt>.project</tt> in the submission as well as all the pre-existing files in the codebase, and not merely your modified files.
+        </li><li> Your animation videos.
+        </li><li>A readme file containing
+            <ul>
+                <li> You and your partner’s names and NetIDs.
+                </li><li> Any problems with your solution.
+                </li><li> Anything else you want us to know.
+                </li></ul>
+        </li></ol> 
