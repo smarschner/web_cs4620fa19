@@ -11,6 +11,7 @@
 
 <h3>Written Part</h3>
 <p class="duedate">Due:  Friday November 15 2019 (11:59pm)</p>
+Points: 15
 <p><strong>Do this project alone or in groups of two, as you prefer. </strong>You can use <a href="https://piazza.com/cornell/fall2019/cs46205620/home">Piazza</a> to help pair yourselves up.
 
 <p>Note: You should feel free to use a symbolic algebra package, such as <a href="http://www.wolframalpha.com/examples/mathematics/linear-algebra/">Wolfram Alpha</a> and/or numerical math tools like Matlab/NumPy/Julia etc., to help with these problems.  These tools will also be useful for making plots.
@@ -30,7 +31,7 @@ hardly distinguish between <i>C<sup>2</sup></i> continuity and higher levels of 
     
     <li>We have a quintic B&eacute;zier (degree 5). How many control points do we need?</li>
 
-    <li>Consider the cubic B&eacute;zier segment defined by the points at the corners of a 2-unit square: \((-1, -1)\), \((-1, 1)\), \((1, 1)\), and \((1, -1)\).  Use de Casteljau's algorithm (presented in class or in section 15.6 of the textbook) to divide this curve at the ratio of 4:6. In other words, a recurrence for computing points on B&eacute;zier spline: \(p_{0,i} = p_i\) and \(p_{n,i} = 0.4 p_{n-1,i} + 0.6 p_{n-1,i+1}\).
+    <li>Consider the cubic B&eacute;zier segment defined by the points at the corners of a 2-unit square: \((-1, -1)\), \((-1, 1)\), \((1, 1)\), and \((1, -1)\).  Use de Casteljau's algorithm (presented in class or in section 15.6 of the textbook) to divide this curve at the ratio of 4:6. In other words, a recurrence for computing points on B&eacute;zier spline: \(p_{0,i} = p_i\) and \(p_{n,i} = 0.4 p_{n-1,i} + 0.6 p_{n-1,i+1}\). This also means to split the splines at the point \(t=0.6\).
         <ol><li>What are the control points of the two sub-segments?
             <li>What's the value of \(t\) evaluating in the left segment that produces the same point as evaluating the original segment at \(t=0.6\)?
             <li>Evaluate the two segments using the matrix form of the equation to show that these two evaluations produce the same point.
@@ -148,6 +149,7 @@ that
 
 <h3>Programming Part</h3>
 <p class="duedate">Due:  Friday November 22 2019 (11:59pm)</p>
+Points: 85
 <p><strong>Do this project alone or in groups of two, as you prefer. </strong>You can use <a href="https://piazza.com/cornell/fall2019/cs46205620/home">Piazza</a> to help pair yourselves up.
 
 
@@ -250,7 +252,7 @@ sure you have the algorithm right.</p>
 
 <p>To draw our Catmull-Rom splines, we'll first convert them to cubic Bézier curves. This is done by the toBezier() method in CatmullRom.java, and the setBeziers() method in SplineCurve.java.</p>
 
-<p> The toBezier() method in CatmullRom.java simply uses the control points of a single Catmull-Rom segment to create an equivalent Bézier curve. This amounts to implementing the solution to written problem 2.1 above.</p>
+<p> The toBezier() method in CatmullRom.java simply uses the control points of a single Catmull-Rom segment to create an equivalent Bézier curve. This is similar to implementing the solution to written problem 2.1 above, but changing the B-spline to Catmull-Rom spline in the problem.</p>
 
 <p>The setBeziers() method in SplineCurve.java constructs an ArrayList of Béziers, bezierCurves, that make up the SplineCurve (the parent class of CatmullRom). The spline editor hands you a list of control points, numbered from 0 to N-1, which are provided in the ArrayList controlPoints. These control points define a chain of curves that we'll want to draw. Finding which four control points influence a segment of the Catmull-Rom Spline is mostly simple: segment i of the curve is influenced by control points i-1, i, i+1, and i+2. Using this definition we can generate N-3 Bézier segments from the N control points without falling off the ends of the sequence, which is exactly what we'd like to do in the case of an open curve. However, you may have noticed a boolean called isClosed in your SplineCurve. To handle closed splines, you'll need to tack on a few additional Bézier curves. We'll let you figure out exactly how to handle this, but know that you'll need to "wrap around" to the start of your control point list.</p>
 
