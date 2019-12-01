@@ -14,7 +14,7 @@
 <p>
     In keyframes for computer animation, properties of objects in a scene (especially including the transformations that define their positions) are specified for particular moments in time, and these properties are then interpolated across time to create continuous motion, which can be sampled at any desired rate to produce the frames of an animation.  The crucial operation needed to render keyframe animations is interpolation: for any particular point in time, the properties of each object are computed by finding the relevant keyframes (normally one or two before the current time and one or two after) and interpolating between the data stored at those frames.</p>
 <p>
-    For this assignment, you will write the core interpolation code for a simple system for animating 3D shapes arranged in a transformation hierarchy. The only properties you will animate are the transformations, expressed as 3D translations, rotations, and scales. In addition, you will create your own puppet and interesting animations with it.
+    For this assignment, you will write the core interpolation code for a simple system for animating 3D shapes arranged in a transformation hierarchy. The only properties you will animate are the transformations, expressed as 3D translations, rotations, and scales. In addition, you will create your own character and interesting animations with it.
 <p>
 A new commit has been pushed to the <a href="https://github.com/smarschner/frameworks_cs4620fa19">frameworks_cs4620fa19 repository</a>. The framework for this assignment is under the <tt>manip</tt> directory.
 For this project, we use lwjgl, so you may need to update some settings of your build to have this external library work properly. We have included the correct jar files, but you may need to configure your native library location. To do this in Eclipse, go to <tt> Project -&gt; Properties -&gt; Java Build Path -&gt; Select Libraries -&gt; Select the lwjgl Drop Down Menu -&gt; Modify Native Library Location. </tt> Modify this setting so that it matches your OS. We have added a framework in the package anim that stores keyframes and provides an interface for editing them.
@@ -30,8 +30,8 @@ For this project, we use lwjgl, so you may need to update some settings of your 
         <li> Editing a keyframe: Left click on it, edit the transformations at that state, and press <tt>N</tt> to update the keyframe's transformation.</li>
         <li> Removing a keyframe: Navigate to a keyframe and press the <tt>M</tt> key to remove.</li>
         <li> Playing and pausing the animation: The <tt>space bar</tt> is used to play or pause the animation.</li>
-        <li> Changing the method of rotation: The <tt>/</tt> key is used to alternate between three methods of rotation.</li>
-        <li> Manipulator: Right click on a object to reveal its manipulators. Press <tt>T</tt> <tt>R</tt> <tt>S</tt> to switch between translation, rotation and scaling manipulators. Drag on the manipulator with right mouse button to transform the object.
+        <!--<li> Changing the method of rotation: The <tt>/</tt> key is used to alternate between three methods of rotation.</li>-->
+        <li> Manipulator: Right click on a object to reveal its manipulators. Press <tt>T</tt> <tt>R</tt> <tt>S</tt> to switch between translation, rotation and scaling manipulators. Drag on the manipulator with right mouse button to transform the object. Note that only the manipulators enabled for a node will be displayed. See section on creating a character for details.
         <li> Camera pan and tilt: Left click and drag.
             <ul>
               <li><tt>WASD</tt>: Move the camera left/right, zoom in/out</li>
@@ -53,16 +53,17 @@ For this project, we use lwjgl, so you may need to update some settings of your 
 
     <h4>What You Will Do</h4>
 
-    All the parts you need to implement are in AnimationTimeline.java.
+    Most of the parts you need to implement are in AnimationTimeline.java. You will also implement the quaternion interpolation method in the library.
     <ul>
         <li> Implement <tt>AnimationTimeline.addKeyFrame</tt>.</li>
         <li> Implement <tt>AnimationTimeline.removeKeyFrame</tt>.</li>
         <li> Implement <tt>AnimationTimeline.updateTransformation</tt> &mdash; 
             A method that computes the transformation for the current time.</li>
-        <li> Create Your Own Puppet &mdash; 
-          After completing this short coding assignment, create a puppet with the provided primitives (spheres, cubes and cylinders) and any additional object you like (specified by OBJ files), and put it in <tt>Puppet.xml</tt>. Your puppet should have at least three rotational joints. See <tt>data/scenes/Robot.xml</tt> for an example. If you cannot come up with anything interesting, we recommend recreating the <a href="https://en.wikipedia.org/wiki/Luxo_Jr.">Pixar Luxo Jr. lamp</a> using cones, cylinders, as well as spheres for joints.</li>
+        <li> Implement <tt>egl.math.Quat.slerp</tt> in <tt>src/egl/math/Quat.java</tt>.</li>
+        <li> Create Your Own Character &mdash; 
+          After completing this short coding assignment, create a character with the provided primitives (spheres, cubes and cylinders) and any additional object you like (specified by OBJ files), and put it in <tt>Character.xml</tt>. Your character should have at least three rotational joints. See <tt>data/scenes/Robot.xml</tt> for an example. If you cannot come up with anything interesting, we recommend recreating the <a href="https://en.wikipedia.org/wiki/Luxo_Jr.">Pixar Luxo Jr. lamp</a> using cones, cylinders, as well as spheres for joints.</li>
         <li> Create Interesting Animation &mdash; 
-            Use your own puppet to create an interesting animation. This should showcase all of your working transformations (rotation, scaling, and translation). Screen capture your animation and include this video in your submission.</li>
+            Use your own character to create an interesting animation. This should showcase all of your working transformations, i.e. rotationswith respect to at least three joints, and at least one translation or one scaling. Screen capture your animation and include this video in your submission.</li>
         <!--<li> Create Buggy Animation &mdash;
           After you have implemented the three methods of rotation use one of the included scenes to demonstrate a "bug" with using Euler angles to interpolate rotations, and then show how using a spherical linear interpolation between quaternions resolves the issue. Screen capture your animation and include this video in your submission.</li>-->
     </ul>
@@ -146,28 +147,27 @@ For this project, we use lwjgl, so you may need to update some settings of your 
     q = \frac{sin(\Omega - t\Omega)}{sin\Omega}q_1 + \frac{sin(t\Omega)}{sin\Omega}q_2
     \]
 
-    We have implementated this in the <tt>egl.math.Quat.slerp</tt> function for you as well.
+    <p> You are asked to implement this in the <tt>egl.math.Quat.slerp</tt> function, in <tt>src/eglmath/Quat.java</tt>. You will first calculate the angle \(\Omega\) between \(q_1\) and \(q_2\). If it is smaller than 0.01, apply linear interpolation. Otherwise, apply spherical linear interpolation.
 
 
 
-    <h4>Interpolation Modes</h4>
-    Our framework supports two different interpolation modes: Linear interpolation of quaternions and spherical linear interpolation of quaternions. You will need to support both of these in the function <tt>AnimationTimeline.updateTransformation</tt>. The mode currently selected is indicated by the argument <tt>rotation</tt>. We have described the two modes in detail above. <!--In order to implement Euler angles, you will need to decompose the rotation matrices into Euler angles (using a function we have provided), linearly interpolate, and then recompose into a rotation matrix (you will find useful Matrix3 functions for this).-->
+                                                                                                                                                                                                                                                                                                                                                                                                                                  <p>You will also need to support spherical linear interpolation of quaternions in the function <tt>AnimationTimeline.updateTransformation</tt>. </p><!-- The mode currently selected is indicated by the argument <tt>rotation</tt>. We have described the two modes in detail above. In order to implement Euler angles, you will need to decompose the rotation matrices into Euler angles (using a function we have provided), linearly interpolate, and then recompose into a rotation matrix (you will find useful Matrix3 functions for this).-->
 
-    <h4>Build Your Own Puppet</h4>
-    You are expected to build your own puppet using the provided primitives (spheres, cones, cylinders and cubes) as well as any additional OBJs you like. See the <tt>data/scenes/Robot.xml</tt> for reference. Your puppet should be modelled hierarchically, and have at least three rotational joints (ankles, wrists, elbows, knees, etc.), represented by spheres. The following fields can be specified for enabling/defining transformations for the nodes.
+    <h4>Build Your Own Character</h4>
+    You are expected to build your own character using the provided primitives (spheres, cylinders, cubes and cones in <tt>data/meshes/cone.obj</tt>) as well as any additional OBJs you like. See the <tt>data/scenes/Robot.xml</tt> for reference. Your character should be modelled hierarchically, and have at least three rotational joints (ankles, wrists, elbows, knees, etc.), represented by spheres. The following fields can be specified for enabling/defining transformations for the nodes.
     <ul>
       <li><tt>rotateX</tt>, <tt>rotateY</tt>, <tt>rotateZ</tt>: Each takes two float parameters specifying the range of the rotation in degrees. The range is clamped to [-180.0, 180.0] in the code. The rotation in a direction is only enabled when the corresponding field is defined, e.g. if you only specify <tt>rotateX</tt> for a node, then its rotations in the y and z directions are disabled. </li>
       <li><tt>enableScale</tt>: Takes three integer parameters of values 0/1 corresponding to scaling in the x, y and z directions. For example, <tt>&lt;enableScale&gt;0 1 0&lt;/enableScale&gt;</tt> enables scaling a node in the y direction only. Scaling is disabled for a node if this field is not specified.</li>
       <li><tt>enableTranslate</tt>: Similar to <tt>enableScale</tt>, takes three integer parameters of values 0/1 corresponding to translating in the x, y and z directions.</li>
     </ul>
     <p>
-    Specify the rotation ranges carefully such that all possible motions of your puppet are physically reasonable. For example, the elbow should only bend inwards and never outwards. To rotate a node with respect to another node, e.g. rotate the lower arm with respect to the elbow, you should specify the elbow as the parent of the lower arm, and enable the rotation in the x, y or z direction for the lower arm.
+    Specify the rotation ranges carefully such that all possible motions of your character are physically reasonable. For example, the elbow should only bend inwards and never outwards. To rotate a node with respect to another node, e.g. rotate the lower arm with respect to the elbow, you should specify the elbow as the parent of the lower arm, and enable the rotation in the x, y or z direction for the lower arm.
     <p>
-    Store your puppet in <tt>Puppet.xml</tt> in the top-level folder of the assignment. If you cannot come up with anything interesting, we recommend recreating the <a href="https://en.wikipedia.org/wiki/Luxo_Jr.">Pixar Luxo Jr. lamp</a> using cones, cylinders, as well as spheres for joints. </li>
+    Store your character in <tt>Character.xml</tt> in the top-level folder of the assignment. If you cannot come up with anything interesting, we recommend recreating the <a href="https://en.wikipedia.org/wiki/Luxo_Jr.">Pixar Luxo Jr. lamp</a> using cones, cylinders, as well as spheres for joints. </li>
     </p>
 
     <h4>Create Interesting Animation</h4>
-    Your animation should demonstrate the possible motions (scale, rotation, and translation) of your puppet. If you have a lamp puppet, the lamp should be able to jump forward and bounce in place. Keep in mind that inserting keyframes and changing the motion by a little every frame will help achieve smoother motions.  
+    Your animation should demonstrate the possible motions (scale, rotation, and translation) of your character. If you have a lamp character, the lamp should be able to jump forward and bounce in place. Keep in mind that inserting keyframes and changing the motion by a little every frame will help achieve smoother motions.  
 
     <h3>Build Your Transform Hierarchy Wisely</h3>
     When you change the parent of an object, the inherited base transformation will also change. This may sometimes lead to unexpected consequences if the transform hierachy is designed poorly. Try changing the parent of the Teapot in <tt>Table.xml</tt> and see what happens. <tt>Table2.xml</tt> models exactly the same scene but with a better transform hierachy.
@@ -175,7 +175,7 @@ For this project, we use lwjgl, so you may need to update some settings of your 
     <h3>Demo Video</h3>
     This short video shows what to expect after correctly completing the coding portion of the assignment.
 
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/xgJbMma4-FM" frameborder="0" allowfullscreen></iframe>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/YV5uiuRt8kQ" frameborder="0" allowfullscreen></iframe>
 
 
     <h3>What to Submit</h3>
@@ -191,7 +191,7 @@ For this project, we use lwjgl, so you may need to update some settings of your 
                 </li><li> Anything else you want us to know.
                 </li></ul>
         </li></ol> 
-        The framework for this assignment is a simple animation player that supports loading and playing animations of hierarchical 2D scenes.  Articulated figures are particularly common animation subjects, and we include a couple of simple puppet-like figures to use as examples.  Once loaded into the system, a model is a hierarchy of <tt>Shape</tt> objects, each with a rectangular image that defines its appearance and transformation parameters that describe its location in the scene.  The transformation parameters are:
+        The framework for this assignment is a simple animation player that supports loading and playing animations of hierarchical 2D scenes.  Articulated figures are particularly common animation subjects, and we include a couple of simple character-like figures to use as examples.  Once loaded into the system, a model is a hierarchy of <tt>Shape</tt> objects, each with a rectangular image that defines its appearance and transformation parameters that describe its location in the scene.  The transformation parameters are:
         <ol>
             <li>Translation (a 2-vector)</li>
             <li>Rotation (a scalar angle in degrees)</li>
@@ -205,23 +205,3 @@ For this project, we use lwjgl, so you may need to update some settings of your 
     <p>
         Since this is just an animation player, it has very simple controls like a video player: play/pause, single frame forward/back, and go to start/end.
     </p>
-
-    <h3>Reference Videos</h3>
-    These videos show the output of our simulation playing the provided example videos.
-
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/xgJbMma4-FM" frameborder="0" allowfullscreen></iframe>
-
-
-    <h3>What to Submit</h3>
-
-    Submit a zip file containing:
-    <ol>
-        <li> Your solution organized the same way as the code on CMS. Please include your <tt>.classpath</tt> and <tt>.project</tt> in the submission as well as all the pre-existing files in the codebase, and not merely your modified files.
-        </li><li> Your animation videos.
-        </li><li>A readme file containing
-            <ul>
-                <li> You and your partner’s names and NetIDs.
-                </li><li> Any problems with your solution.
-                </li><li> Anything else you want us to know.
-                </li></ul>
-        </li></ol> 
